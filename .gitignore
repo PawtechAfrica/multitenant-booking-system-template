@@ -1,0 +1,98 @@
+# ===========================
+# Dependencies
+# ===========================
+node_modules/
+
+# ===========================
+# Environment variables
+# ===========================
+.env
+.env.*
+!.env.example
+
+# ===========================
+# Logs
+# ===========================
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===========================
+# Runtime files
+# ===========================
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ===========================
+# Coverage
+# ===========================
+coverage/
+.nyc_output/
+
+# ===========================
+# Build output
+# ===========================
+dist/
+build/
+out/
+
+# ===========================
+# Temporary files
+# ===========================
+tmp/
+temp/
+.cache/
+
+# ===========================
+# OS files
+# ===========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===========================
+# IDE / Editor
+# ===========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*.orig
+
+# ===========================
+# Sequelize
+# ===========================
+database.sqlite
+database.sqlite3
+
+# ===========================
+# Uploads
+# ===========================
+uploads/
+public/uploads/
+
+# Ignore uploaded images/files
+*.tmp
+
+# ===========================
+# Testing
+# ===========================
+test-results/
+playwright-report/
+
+# ===========================
+# Docker
+# ===========================
+docker-data/
+postgres-data/
+
+# ===========================
+# Misc
+# ===========================
+*.tgz
+*.gz
