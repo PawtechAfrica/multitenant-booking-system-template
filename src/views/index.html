@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Booking Backend : Admin Test Console</title>
+<style>
+  :root {
+    --navy: #1c2b3a;
+    --blue: #3c6e8f;
+    --green: #2e7d32;
+    --amber: #ef6c00;
+    --red: #c62828;
+    --bg: #f4f6f8;
+    --card: #ffffff;
+    --border: #dde3e8;
+    --text: #232323;
+    --muted: #6b7680;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ---------- Sidebar ---------- */
+  #sidebar {
+    width: 280px;
+    background: var(--navy);
+    color: #dfe8ee;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  #sidebar h1 {
+    font-size: 15px;
+    padding: 16px 16px 8px 16px;
+    margin: 0;
+    color: #fff;
+  }
+  #sidebar .sub {
+    padding: 0 16px 12px 16px;
+    font-size: 11px;
+    color: #9fb3c2;
+  }
+  #search {
+    margin: 0 16px 10px 16px;
+    padding: 7px 10px;
+    border-radius: 5px;
+    border: 1px solid #33495c;
+    background: #223649;
+    color: #fff;
+    font-size: 12.5px;
+  }
+  #search::placeholder { color: #7f96a8; }
+  #endpoint-list {
+    overflow-y: auto;
+    flex: 1;
+    padding-bottom: 20px;
+  }
+  .group-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: #7f96a8;
+    padding: 12px 16px 4px 16px;
+  }
+  .endpoint-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    color: #cfe0ea;
+    padding: 7px 16px;
+    font-size: 12.5px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+  }
+  .endpoint-btn:hover { background: #22364a; }
+  .endpoint-btn.active { background: #22415a; border-left-color: #6fb1d6; color: #fff; }
+  .method-tag {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: #fff;
+    min-width: 40px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .m-GET { background: var(--green); }
+  .m-POST { background: var(--blue); }
+  .m-PATCH { background: var(--amber); }
+  .m-DELETE { background: var(--red); }
+
+  /* ---------- Top bar ---------- */
+  #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  #topbar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 20px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+  .field { display: flex; flex-direction: column; gap: 3px; }
+  .field label { font-size: 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+  .field input, .field select {
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-size: 12.5px;
+    min-width: 150px;
+    font-family: 'Courier New', monospace;
+  }
+  #tokenInfo {
+    font-size: 11px;
+    color: var(--muted);
+    padding: 4px 8px;
+    background: #eef3f6;
+    border-radius: 5px;
+    white-space: nowrap;
+  }
+  #tokenInfo b { color: var(--blue); }
+  .clear-btn {
+    background: #fdecea; border: 1px solid #f3c6c2; color: var(--red);
+    border-radius: 5px; padding: 6px 10px; font-size: 11.5px; cursor: pointer;
+  }
+
+  /* ---------- Content ---------- */
+  #content { flex: 1; overflow-y: auto; padding: 22px 28px; }
+  #placeholder { color: var(--muted); font-size: 14px; margin-top: 60px; text-align: center; }
+  .req-header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .req-header h2 { font-size: 17px; margin: 0; }
+  .path-display {
+    font-family: 'Courier New', monospace; font-size: 12.5px; color: var(--muted);
+    margin-bottom: 18px; word-break: break-all;
+  }
+  .panel {
+    background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 16px 18px; margin-bottom: 16px;
+  }
+  .panel h3 {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted);
+    margin: 0 0 10px 0;
+  }
+  .param-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .param-row label { width: 150px; font-size: 12.5px; font-family: 'Courier New', monospace; flex-shrink: 0; }
+  .param-row input {
+    flex: 1; padding: 6px 8px; border: 1px solid var(--border); border-radius: 5px;
+    font-size: 12.5px; font-family: 'Courier New', monospace;
+  }
+  textarea#bodyEditor {
+    width: 100%; min-height: 160px; font-family: 'Courier New', monospace; font-size: 12.5px;
+    padding: 10px; border: 1px solid var(--border); border-radius: 6px; resize: vertical;
+    background: #fbfcfd;
+  }
+  #sendBtn {
+    background: var(--blue); color: #fff; border: none; padding: 10px 22px;
+    border-radius: 6px; font-size: 13.5px; font-weight: 600; cursor: pointer;
+  }
+  #sendBtn:hover { background: #2f5a75; }
+  #sendBtn:disabled { background: #9fb3c2; cursor: default; }
+  .hint { font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+  /* ---------- Response ---------- */
+  #responsePanel { display: none; }
+  #statusLine {
+    font-family: 'Courier New', monospace; font-size: 13px; font-weight: 700; margin-bottom: 8px;
+    padding: 6px 10px; border-radius: 5px; display: inline-block;
+  }
+  .status-ok { background: #e6f4e9; color: var(--green); }
+  .status-err { background: #fdecea; color: var(--red); }
+  pre#responseBody {
+    background: var(--navy); color: #d7e6ef; padding: 14px; border-radius: 8px;
+    font-size: 12px; overflow-x: auto; max-height: 420px; margin: 0;
+  }
+  .copy-btn {
+    float: right; background: #2a3f52; color: #cfe0ea; border: none; padding: 4px 10px;
+    border-radius: 4px; font-size: 10.5px; cursor: pointer; margin-bottom: 6px;
+  }
+  .file-input { padding: 8px; border: 1px dashed var(--border); border-radius: 6px; width: 100%; }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <h1>Admin Test Console</h1>
+  <div class="sub">Straight Group Booking Backend</div>
+  <input id="search" type="text" placeholder="Filter endpoints...">
+  <div id="endpoint-list"></div>
+</div>
+
+<div id="main">
+  <div id="topbar">
+    <div class="field">
+      <label>Base URL</label>
+      <input id="baseUrl" value="http://localhost:4000/api/v1">
+    </div>
+    <div class="field">
+      <label>Property Slug</label>
+      <input id="propertySlug" value="centurion-hotel">
+    </div>
+    <div class="field">
+      <label>Access Token</label>
+      <input id="accessToken" placeholder="(paste or auto-filled after login)">
+    </div>
+    <div class="field">
+      <label>Refresh Token</label>
+      <input id="refreshToken" placeholder="(auto-filled after login)">
+    </div>
+    <div id="tokenInfo">no token</div>
+    <button class="clear-btn" onclick="clearTokens()">Clear tokens</button>
+  </div>
+
+  <div id="content">
+    <div id="placeholder">Select an endpoint from the left to get started.<br><br>
+      Tip: log in first (Auth → Login) - the access/refresh tokens above fill in automatically,
+      and every authenticated request below will use them.
+    </div>
+
+    <div id="requestArea" style="display:none;">
+      <div class="req-header">
+        <span class="method-tag" id="methodTag"></span>
+        <h2 id="endpointName"></h2>
+      </div>
+      <div class="path-display" id="pathDisplay"></div>
+
+      <div class="panel" id="pathParamsPanel" style="display:none;">
+        <h3>Path parameters</h3>
+        <div id="pathParamsInputs"></div>
+      </div>
+
+      <div class="panel" id="queryParamsPanel" style="display:none;">
+        <h3>Query parameters</h3>
+        <div id="queryParamsInputs"></div>
+      </div>
+
+      <div class="panel" id="bodyPanel" style="display:none;">
+        <h3>Request body (JSON)</h3>
+        <textarea id="bodyEditor"></textarea>
+      </div>
+
+      <div class="panel" id="filePanel" style="display:none;">
+        <h3>File</h3>
+        <input type="file" id="fileInput" class="file-input" accept="image/jpeg,image/png,image/webp">
+        <div class="hint">Uploads as multipart/form-data, field name "file" - matches multer.single('file') on the backend.</div>
+      </div>
+
+      <button id="sendBtn" onclick="sendRequest()">Send Request</button>
+      <div class="hint" id="authHint"></div>
+
+      <div class="panel" id="responsePanel" style="margin-top:18px;">
+        <h3>Response</h3>
+        <button class="copy-btn" onclick="copyResponse()">Copy</button>
+        <div id="statusLine"></div>
+        <pre id="responseBody"></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   ENDPOINT DEFINITIONS
+   path tokens like {propertySlug}, {id}, {bookingCode} become
+   editable path-param inputs. `query` is an object of default
+   values (empty string = optional). `adminScoped: true` adds a
+   `propertyId` query field for superadmin cross-property calls.
+   ============================================================ */
+const endpoints = [
+  // --- AUTH ---
+  { group: 'Auth', name: 'Register (guest)', method: 'POST', path: '/auth/register', auth: false,
+    body: { email: 'guest@example.com', password: 'Password123!', firstName: 'Test', lastName: 'Guest', phone: '0712345678' } },
+  { group: 'Auth', name: 'Login', method: 'POST', path: '/auth/login', auth: false, captureTokens: true,
+    body: { email: 'admin@centurion.test', password: 'Password123!' } },
+  { group: 'Auth', name: 'Refresh token', method: 'POST', path: '/auth/refresh', auth: false, captureTokens: true,
+    body: { refreshToken: '' }, autoFillRefresh: true },
+  { group: 'Auth', name: 'Logout', method: 'POST', path: '/auth/logout', auth: false,
+    body: { refreshToken: '' }, autoFillRefresh: true },
+  { group: 'Auth', name: 'Me', method: 'GET', path: '/auth/me', auth: true },
+
+  // --- PROPERTIES ---
+  { group: 'Properties', name: 'Public: property info', method: 'GET', path: '/properties/{propertySlug}', auth: false },
+  { group: 'Properties', name: 'Admin: get property', method: 'GET', path: '/admin/property', auth: true, adminScoped: true },
+  { group: 'Properties', name: 'Admin: update property', method: 'PATCH', path: '/admin/property', auth: true, adminScoped: true,
+    body: { contactEmail: 'info@centurionhotel.co.ke', contactPhone: '+254700000001', address: 'Nairobi, Kenya', checkInTime: '14:00', checkOutTime: '10:00' } },
+
+  // --- ROOM TYPES ---
+  { group: 'Room Types', name: 'Public: list room types', method: 'GET', path: '/properties/{propertySlug}/room-types', auth: false },
+  { group: 'Room Types', name: 'Public: room type detail', method: 'GET', path: '/properties/{propertySlug}/room-types/{roomTypeSlug}', auth: false },
+  { group: 'Room Types', name: 'Admin: list room types', method: 'GET', path: '/admin/room-types', auth: true, adminScoped: true },
+  { group: 'Room Types', name: 'Admin: create room type', method: 'POST', path: '/admin/room-types', auth: true, adminScoped: true,
+    body: { slug: 'deluxe-room', name: 'Deluxe Room', maxAdults: 2, maxChildren: 1, totalUnits: 8, basePrice: 8500, bedType: 'queen', currency: 'KES', attributes: { amenities: ['WiFi', 'TV'] } } },
+  { group: 'Room Types', name: 'Admin: get room type', method: 'GET', path: '/admin/room-types/{id}', auth: true, adminScoped: true },
+  { group: 'Room Types', name: 'Admin: update room type', method: 'PATCH', path: '/admin/room-types/{id}', auth: true, adminScoped: true,
+    body: { isActive: true } },
+  { group: 'Room Types', name: 'Admin: delete room type', method: 'DELETE', path: '/admin/room-types/{id}', auth: true, adminScoped: true },
+  { group: 'Room Types', name: 'Admin: add image', method: 'POST', path: '/admin/room-types/{id}/images', auth: true, adminScoped: true,
+    body: { url: 'https://example.com/room.jpg', isCover: true } },
+  { group: 'Room Types', name: 'Admin: update image', method: 'PATCH', path: '/admin/room-types/{id}/images/{imageId}', auth: true, adminScoped: true,
+    body: { sortOrder: 1 } },
+  { group: 'Room Types', name: 'Admin: delete image', method: 'DELETE', path: '/admin/room-types/{id}/images/{imageId}', auth: true, adminScoped: true },
+
+  // --- AVAILABILITY ---
+  { group: 'Availability', name: 'Check availability', method: 'GET', path: '/properties/{propertySlug}/availability', auth: false,
+    query: { checkIn: '2026-08-10', checkOut: '2026-08-12', adults: '2', children: '0' } },
+
+  // --- BOOKINGS (guest) ---
+  { group: 'Bookings', name: 'Create booking', method: 'POST', path: '/bookings', auth: false,
+    body: { propertySlug: 'centurion-hotel', roomTypeId: '', checkInDate: '2026-08-10', checkOutDate: '2026-08-12', numAdults: 2, numChildren: 0, numRooms: 1, guestFirstName: 'Lawrence', guestLastName: 'O', guestEmail: 'lawrence@example.com', guestPhone: '0712345678', specialRequests: '' } },
+  { group: 'Bookings', name: 'Guest lookup booking', method: 'GET', path: '/bookings/{bookingCode}', auth: false,
+    query: { email: 'lawrence@example.com' } },
+  { group: 'Bookings', name: 'Guest cancel booking', method: 'POST', path: '/bookings/{bookingCode}/cancel', auth: false,
+    body: { email: 'lawrence@example.com' } },
+
+  // --- ADMIN BOOKINGS ---
+  { group: 'Admin Bookings', name: 'List bookings', method: 'GET', path: '/admin/bookings', auth: true, adminScoped: true,
+    query: { status: '', search: '', from: '', to: '', page: '1', pageSize: '20' } },
+  { group: 'Admin Bookings', name: 'Get booking', method: 'GET', path: '/admin/bookings/{id}', auth: true, adminScoped: true },
+  { group: 'Admin Bookings', name: 'Update status', method: 'PATCH', path: '/admin/bookings/{id}/status', auth: true, adminScoped: true,
+    body: { status: 'confirmed' } },
+  { group: 'Admin Bookings', name: 'Assign room', method: 'POST', path: '/admin/bookings/{id}/assign-room', auth: true, adminScoped: true,
+    body: { roomId: '' } },
+  { group: 'Admin Bookings', name: 'Manual booking', method: 'POST', path: '/admin/bookings/manual', auth: true, adminScoped: true,
+    body: { roomTypeId: '', checkInDate: '2026-09-01', checkOutDate: '2026-09-03', guestFirstName: 'Walk', guestLastName: 'In', guestEmail: 'walkin@example.com', paymentCollected: 'cash' } },
+
+  // --- PAYMENTS ---
+  { group: 'Payments', name: 'STK push', method: 'POST', path: '/payments/mpesa/stkpush', auth: false,
+    body: { bookingCode: '', phoneNumber: '0712345678', amountType: 'deposit' } },
+  { group: 'Payments', name: 'Payment status', method: 'GET', path: '/payments/{bookingCode}/status', auth: false },
+  { group: 'Payments', name: 'Admin: list payments', method: 'GET', path: '/admin/payments', auth: true, adminScoped: true,
+    query: { bookingId: '', status: '' } },
+  { group: 'Payments', name: 'Admin: request refund', method: 'POST', path: '/admin/payments/{id}/refund', auth: true, adminScoped: true,
+    body: { amount: 1000, reason: 'Guest cancelled' } },
+  { group: 'Payments', name: 'Admin: update refund status', method: 'PATCH', path: '/admin/refunds/{id}/status', auth: true, adminScoped: true,
+    body: { status: 'completed' } },
+
+  // --- STAFF (superadmin only) ---
+  { group: 'Staff', name: 'Create staff', method: 'POST', path: '/admin/staff', auth: true,
+    body: { email: 'frontdesk@centurion.test', firstName: 'Grace', lastName: 'W', role: 'staff', propertyId: '' } },
+  { group: 'Staff', name: 'List staff', method: 'GET', path: '/admin/staff', auth: true,
+    query: { propertyId: '' } },
+  { group: 'Staff', name: 'Update staff', method: 'PATCH', path: '/admin/staff/{id}', auth: true,
+    body: { isActive: true } },
+  { group: 'Staff', name: 'Deactivate staff', method: 'DELETE', path: '/admin/staff/{id}', auth: true },
+
+  // --- CANCELLATION POLICIES ---
+  { group: 'Cancellation Policies', name: 'List', method: 'GET', path: '/admin/cancellation-policies', auth: true, adminScoped: true },
+  { group: 'Cancellation Policies', name: 'Create', method: 'POST', path: '/admin/cancellation-policies', auth: true, adminScoped: true,
+    body: { name: 'Standard', tiers: [{ days_before: 15, refund_pct: 100 }, { days_before: 14, refund_pct: 50 }, { hours_before: 48, refund_pct: 0 }], depositPct: 30, isDefault: true } },
+  { group: 'Cancellation Policies', name: 'Update', method: 'PATCH', path: '/admin/cancellation-policies/{id}', auth: true, adminScoped: true,
+    body: { depositPct: 25 } },
+  { group: 'Cancellation Policies', name: 'Delete', method: 'DELETE', path: '/admin/cancellation-policies/{id}', auth: true, adminScoped: true },
+  { group: 'Cancellation Policies', name: 'Set as default', method: 'PATCH', path: '/admin/cancellation-policies/{id}/set-default', auth: true, adminScoped: true },
+
+  // --- RATE PLANS ---
+  { group: 'Rate Plans', name: 'List', method: 'GET', path: '/admin/rate-plans', auth: true, adminScoped: true,
+    query: { roomTypeId: '' } },
+  { group: 'Rate Plans', name: 'Create', method: 'POST', path: '/admin/rate-plans', auth: true, adminScoped: true,
+    body: { roomTypeId: '', name: 'August Discount', priceOverride: 7000, validFrom: '2026-08-01', validTo: '2026-08-31' } },
+  { group: 'Rate Plans', name: 'Update', method: 'PATCH', path: '/admin/rate-plans/{id}', auth: true, adminScoped: true,
+    body: { isActive: false } },
+  { group: 'Rate Plans', name: 'Delete', method: 'DELETE', path: '/admin/rate-plans/{id}', auth: true, adminScoped: true },
+
+  // --- OFFERS ---
+  { group: 'Offers', name: 'Public: list offers', method: 'GET', path: '/properties/{propertySlug}/offers', auth: false },
+  { group: 'Offers', name: 'Admin: list offers', method: 'GET', path: '/admin/offers', auth: true, adminScoped: true },
+  { group: 'Offers', name: 'Admin: create offer', method: 'POST', path: '/admin/offers', auth: true, adminScoped: true,
+    body: { title: 'Midweek Escape', discountType: 'percentage', discountValue: 20 } },
+  { group: 'Offers', name: 'Admin: update offer', method: 'PATCH', path: '/admin/offers/{id}', auth: true, adminScoped: true,
+    body: { isActive: false } },
+  { group: 'Offers', name: 'Admin: delete offer', method: 'DELETE', path: '/admin/offers/{id}', auth: true, adminScoped: true },
+
+  // --- EVENT TYPES ---
+  { group: 'Event Types', name: 'Public: list', method: 'GET', path: '/properties/{propertySlug}/event-types', auth: false },
+  { group: 'Event Types', name: 'Admin: list', method: 'GET', path: '/admin/event-types', auth: true, adminScoped: true },
+  { group: 'Event Types', name: 'Admin: create', method: 'POST', path: '/admin/event-types', auth: true, adminScoped: true,
+    body: { title: 'Corporate Board Meetings', icon: 'briefcase', sortOrder: 1 } },
+  { group: 'Event Types', name: 'Admin: update', method: 'PATCH', path: '/admin/event-types/{id}', auth: true, adminScoped: true,
+    body: { isActive: true } },
+  { group: 'Event Types', name: 'Admin: delete', method: 'DELETE', path: '/admin/event-types/{id}', auth: true, adminScoped: true },
+  { group: 'Event Types', name: 'Admin: reorder', method: 'PATCH', path: '/admin/event-types/reorder', auth: true, adminScoped: true,
+    body: { items: [{ id: '', sortOrder: 0 }] } },
+
+  // --- INQUIRIES ---
+  { group: 'Inquiries', name: 'Public: submit', method: 'POST', path: '/inquiries', auth: false,
+    body: { propertySlug: 'centurion-hotel', type: 'group_bookings', name: 'Jane', email: 'jane@example.com', message: '30-person wedding in October', partySize: 30 } },
+  { group: 'Inquiries', name: 'Admin: list', method: 'GET', path: '/admin/inquiries', auth: true, adminScoped: true,
+    query: { type: '', status: '' } },
+  { group: 'Inquiries', name: 'Admin: get one', method: 'GET', path: '/admin/inquiries/{id}', auth: true, adminScoped: true },
+  { group: 'Inquiries', name: 'Admin: update status', method: 'PATCH', path: '/admin/inquiries/{id}/status', auth: true, adminScoped: true,
+    body: { status: 'contacted' } },
+
+  // --- PHYSICAL ROOMS ---
+  { group: 'Rooms', name: 'Admin: list rooms', method: 'GET', path: '/admin/rooms', auth: true, adminScoped: true,
+    query: { roomTypeId: '', status: '' } },
+  { group: 'Rooms', name: 'Admin: create room', method: 'POST', path: '/admin/rooms', auth: true, adminScoped: true,
+    body: { roomTypeId: '', roomNumber: '101', floor: '1' } },
+  { group: 'Rooms', name: 'Admin: update room', method: 'PATCH', path: '/admin/rooms/{id}', auth: true, adminScoped: true,
+    body: { floor: '2' } },
+  { group: 'Rooms', name: 'Admin: update room status', method: 'PATCH', path: '/admin/rooms/{id}/status', auth: true, adminScoped: true,
+    body: { status: 'maintenance' } },
+  { group: 'Rooms', name: 'Admin: delete room', method: 'DELETE', path: '/admin/rooms/{id}', auth: true, adminScoped: true },
+
+  // --- REPORTS ---
+  { group: 'Reports', name: 'Occupancy', method: 'GET', path: '/admin/reports/occupancy', auth: true, adminScoped: true,
+    query: { from: '2026-08-01', to: '2026-08-31' } },
+  { group: 'Reports', name: 'Revenue', method: 'GET', path: '/admin/reports/revenue', auth: true, adminScoped: true,
+    query: { from: '2026-08-01', to: '2026-08-31' } },
+
+  // --- MEDIA & GALLERY ---
+  { group: 'Media & Gallery', name: 'Upload image (Cloudinary)', method: 'POST', path: '/admin/media/upload', auth: true, adminScoped: true, isFile: true },
+  { group: 'Media & Gallery', name: 'Public: list gallery', method: 'GET', path: '/properties/{propertySlug}/gallery', auth: false,
+    query: { category: '' } },
+  { group: 'Media & Gallery', name: 'Admin: list gallery', method: 'GET', path: '/admin/gallery', auth: true, adminScoped: true,
+    query: { category: '' } },
+  { group: 'Media & Gallery', name: 'Admin: create gallery item', method: 'POST', path: '/admin/gallery', auth: true, adminScoped: true,
+    body: { category: 'dining', imageUrl: '', caption: 'Sunset dinner' } },
+  { group: 'Media & Gallery', name: 'Admin: update gallery item', method: 'PATCH', path: '/admin/gallery/{id}', auth: true, adminScoped: true,
+    body: { caption: 'Updated caption' } },
+  { group: 'Media & Gallery', name: 'Admin: delete gallery item', method: 'DELETE', path: '/admin/gallery/{id}', auth: true, adminScoped: true },
+  { group: 'Media & Gallery', name: 'Admin: reorder gallery', method: 'PATCH', path: '/admin/gallery/reorder', auth: true, adminScoped: true,
+    body: { items: [{ id: '', sortOrder: 0 }] } }
+];
+
+let currentEndpoint = null;
+
+/* ---------- Build sidebar ---------- */
+function renderSidebar(filter = '') {
+  const list = document.getElementById('endpoint-list');
+  list.innerHTML = '';
+  const groups = {};
+  endpoints.forEach((ep, idx) => {
+    if (filter && !(ep.name.toLowerCase().includes(filter) || ep.path.toLowerCase().includes(filter) || ep.group.toLowerCase().includes(filter))) return;
+    if (!groups[ep.group]) groups[ep.group] = [];
+    groups[ep.group].push({ ...ep, idx });
+  });
+  Object.keys(groups).forEach(groupName => {
+    const label = document.createElement('div');
+    label.className = 'group-label';
+    label.textContent = groupName;
+    list.appendChild(label);
+    groups[groupName].forEach(ep => {
+      const btn = document.createElement('button');
+      btn.className = 'endpoint-btn';
+      btn.dataset.idx = ep.idx;
+      btn.innerHTML = `<span class="method-tag m-${ep.method}">${ep.method}</span><span>${ep.name}</span>`;
+      btn.onclick = () => selectEndpoint(ep.idx, btn);
+      list.appendChild(btn);
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  renderSidebar(e.target.value.toLowerCase());
+});
+
+/* ---------- Select endpoint & build form ---------- */
+function selectEndpoint(idx, btnEl) {
+  document.querySelectorAll('.endpoint-btn').forEach(b => b.classList.remove('active'));
+  if (btnEl) btnEl.classList.add('active');
+
+  currentEndpoint = endpoints[idx];
+  document.getElementById('placeholder').style.display = 'none';
+  document.getElementById('requestArea').style.display = 'block';
+  document.getElementById('responsePanel').style.display = 'none';
+
+  document.getElementById('methodTag').textContent = currentEndpoint.method;
+  document.getElementById('methodTag').className = 'method-tag m-' + currentEndpoint.method;
+  document.getElementById('endpointName').textContent = currentEndpoint.name;
+  document.getElementById('pathDisplay').textContent = currentEndpoint.method + '  ' + currentEndpoint.path;
+
+  // Path params
+  const pathParams = [...currentEndpoint.path.matchAll(/\{(\w+)\}/g)].map(m => m[1]);
+  const pathPanel = document.getElementById('pathParamsPanel');
+  const pathInputs = document.getElementById('pathParamsInputs');
+  pathInputs.innerHTML = '';
+  if (pathParams.length > 0) {
+    pathPanel.style.display = 'block';
+    pathParams.forEach(p => {
+      const row = document.createElement('div');
+      row.className = 'param-row';
+      const defaultVal = p === 'propertySlug' ? document.getElementById('propertySlug').value : '';
+      row.innerHTML = `<label>${p}</label><input type="text" data-pathparam="${p}" value="${defaultVal}">`;
+      pathInputs.appendChild(row);
+    });
+  } else {
+    pathPanel.style.display = 'none';
+  }
+
+  // Query params (merge adminScoped propertyId in)
+  const queryPanel = document.getElementById('queryParamsPanel');
+  const queryInputs = document.getElementById('queryParamsInputs');
+  queryInputs.innerHTML = '';
+  const queryFields = { ...(currentEndpoint.query || {}) };
+  if (currentEndpoint.adminScoped) queryFields.propertyId = '';
+  const queryKeys = Object.keys(queryFields);
+  if (queryKeys.length > 0) {
+    queryPanel.style.display = 'block';
+    queryKeys.forEach(key => {
+      const row = document.createElement('div');
+      row.className = 'param-row';
+      row.innerHTML = `<label>${key}</label><input type="text" data-queryparam="${key}" value="${queryFields[key]}">`;
+      queryInputs.appendChild(row);
+    });
+  } else {
+    queryPanel.style.display = 'none';
+  }
+  if (currentEndpoint.adminScoped) {
+    const hint = document.createElement('div');
+    hint.className = 'hint';
+    hint.textContent = 'Leave "propertyId" empty for staff/admin tokens (locked server-side to their own property). Superadmin tokens must set it.';
+    queryInputs.appendChild(hint);
+  }
+
+  // Body
+  const bodyPanel = document.getElementById('bodyPanel');
+  const bodyEditor = document.getElementById('bodyEditor');
+  if (currentEndpoint.body) {
+    bodyPanel.style.display = 'block';
+    let bodyToShow = { ...currentEndpoint.body };
+    if (currentEndpoint.autoFillRefresh) {
+      bodyToShow.refreshToken = document.getElementById('refreshToken').value || '';
+    }
+    bodyEditor.value = JSON.stringify(bodyToShow, null, 2);
+  } else {
+    bodyPanel.style.display = 'none';
+    bodyEditor.value = '';
+  }
+
+  // File
+  document.getElementById('filePanel').style.display = currentEndpoint.isFile ? 'block' : 'none';
+
+  // Auth hint
+  document.getElementById('authHint').textContent = currentEndpoint.auth
+    ? 'Requires Authorization: Bearer <access token> - uses the Access Token field above.'
+    : 'No authentication required for this endpoint.';
+}
+
+/* ---------- JWT decode for the token-info chip ---------- */
+function decodeJwtPayload(token) {
+  try {
+    const payload = token.split('.')[1];
+    const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+    return decoded;
+  } catch (e) {
+    return null;
+  }
+}
+function updateTokenInfo() {
+  const token = document.getElementById('accessToken').value;
+  const chip = document.getElementById('tokenInfo');
+  if (!token) { chip.innerHTML = 'no token'; return; }
+  const payload = decodeJwtPayload(token);
+  if (!payload) { chip.innerHTML = 'invalid token'; return; }
+  const exp = payload.exp ? new Date(payload.exp * 1000).toLocaleTimeString() : '?';
+  chip.innerHTML = `role: <b>${payload.role || '?'}</b> &nbsp;|&nbsp; propertyId: <b>${payload.propertyId || 'none'}</b> &nbsp;|&nbsp; expires ${exp}`;
+}
+document.getElementById('accessToken').addEventListener('input', updateTokenInfo);
+
+function clearTokens() {
+  document.getElementById('accessToken').value = '';
+  document.getElementById('refreshToken').value = '';
+  updateTokenInfo();
+}
+
+/* ---------- Send request ---------- */
+async function sendRequest() {
+  const sendBtn = document.getElementById('sendBtn');
+  sendBtn.disabled = true;
+  sendBtn.textContent = 'Sending...';
+
+  try {
+    let path = currentEndpoint.path;
+    document.querySelectorAll('[data-pathparam]').forEach(input => {
+      path = path.replace(`{${input.dataset.pathparam}}`, encodeURIComponent(input.value || ''));
+    });
+
+    const queryParts = [];
+    document.querySelectorAll('[data-queryparam]').forEach(input => {
+      if (input.value !== '') {
+        queryParts.push(`${encodeURIComponent(input.dataset.queryparam)}=${encodeURIComponent(input.value)}`);
+      }
+    });
+    const queryString = queryParts.length ? '?' + queryParts.join('&') : '';
+
+    const url = document.getElementById('baseUrl').value.replace(/\/$/, '') + path + queryString;
+
+    const headers = {};
+    if (currentEndpoint.auth) {
+      const token = document.getElementById('accessToken').value;
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+    }
+
+    let fetchOptions = { method: currentEndpoint.method, headers };
+
+    if (currentEndpoint.isFile) {
+      const fileInput = document.getElementById('fileInput');
+      if (!fileInput.files.length) {
+        alert('Please choose a file first.');
+        sendBtn.disabled = false; sendBtn.textContent = 'Send Request';
+        return;
+      }
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      fetchOptions.body = formData; // browser sets multipart Content-Type + boundary automatically
+    } else if (currentEndpoint.body) {
+      headers['Content-Type'] = 'application/json';
+      const bodyText = document.getElementById('bodyEditor').value;
+      try {
+        fetchOptions.body = JSON.stringify(JSON.parse(bodyText || '{}'));
+      } catch (e) {
+        showResponse(0, { success: false, error: { code: 'CLIENT_ERROR', message: 'Body is not valid JSON: ' + e.message } });
+        sendBtn.disabled = false; sendBtn.textContent = 'Send Request';
+        return;
+      }
+    }
+
+    const startTime = performance.now();
+    const res = await fetch(url, fetchOptions);
+    const elapsed = Math.round(performance.now() - startTime);
+
+    let data;
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      data = await res.json();
+    } else {
+      data = await res.text();
+    }
+
+    showResponse(res.status, data, elapsed);
+
+    // Auto-capture tokens
+    if (currentEndpoint.captureTokens && data && data.success && data.data) {
+      if (data.data.accessToken) document.getElementById('accessToken').value = data.data.accessToken;
+      if (data.data.refreshToken) document.getElementById('refreshToken').value = data.data.refreshToken;
+      updateTokenInfo();
+    }
+  } catch (err) {
+    showResponse(0, { success: false, error: { code: 'NETWORK_ERROR', message: err.message } });
+  }
+
+  sendBtn.disabled = false;
+  sendBtn.textContent = 'Send Request';
+}
+
+function showResponse(status, data, elapsedMs) {
+  const panel = document.getElementById('responsePanel');
+  panel.style.display = 'block';
+  const statusLine = document.getElementById('statusLine');
+  const isOk = status >= 200 && status < 300;
+  statusLine.className = isOk ? 'status-ok' : 'status-err';
+  statusLine.textContent = `${status || 'ERR'} ${isOk ? 'OK' : ''} ${elapsedMs ? `- ${elapsedMs}ms` : ''}`;
+  document.getElementById('responseBody').textContent =
+    typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+}
+
+function copyResponse() {
+  const text = document.getElementById('responseBody').textContent;
+  navigator.clipboard.writeText(text);
+}
+
+/* ---------- init ---------- */
+renderSidebar();
+</script>
+</body>
+</html>

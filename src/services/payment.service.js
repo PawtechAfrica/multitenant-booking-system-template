@@ -2,6 +2,7 @@ const { Booking, Payment } = require('../database/models')
 const AppError = require('../utils/AppError')
 const { normalizeKenyanPhone } = require('../utils/phone')
 const mpesaService = require('./mpesa.service')
+const notificationService = require('./notification.service')
 
 const NON_PAYABLE_STATUSES = ['cancelled', 'expired', 'no_show']
 
@@ -86,16 +87,36 @@ const initiateStkPush = async ({ bookingCode, phoneNumber, amountType }) => {
   }
 }
 
+// const applyCompletedPaymentToBooking = async (booking, payment) => {
+//   booking.amount_paid = Number(booking.amount_paid) + Number(payment.amount)
+//   booking.balance_due = Math.max(Number(booking.subtotal) - Number(booking.amount_paid), 0)
+
+//   if (booking.status === 'pending_payment' && booking.amount_paid >= Number(booking.deposit_required)) {
+//     booking.status = 'confirmed'
+//   }
+
+//   await booking.save()
+// }
+
+
 const applyCompletedPaymentToBooking = async (booking, payment) => {
   booking.amount_paid = Number(booking.amount_paid) + Number(payment.amount)
   booking.balance_due = Math.max(Number(booking.subtotal) - Number(booking.amount_paid), 0)
 
-  if (booking.status === 'pending_payment' && booking.amount_paid >= Number(booking.deposit_required)) {
+  const justConfirmed = booking.status === 'pending_payment' && booking.amount_paid >= Number(booking.deposit_required)
+  if (justConfirmed) {
     booking.status = 'confirmed'
   }
 
   await booking.save()
+
+  if (justConfirmed) {
+    notificationService.sendBookingStatusEmail(booking.id, 'confirmed') // not awaited -- see note below
+  }
 }
+
+
+
 
 const handleCallback = async (body) => {
   const stkCallback = body?.Body?.stkCallback

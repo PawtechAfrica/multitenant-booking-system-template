@@ -1,0 +1,2191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking Admin 
+    
+  </title>
+  <!-- Font Awesome 6 (free) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #f4f7fc;
+      color: #0f1e2e;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #e2e9f2;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #b0c4d8;
+      border-radius: 12px;
+    }
+
+    /* ----- login ----- */
+    #loginScreen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #e6edf6 0%, #d0ddee 100%);
+      padding: 1.5rem;
+    }
+
+    #loginBox {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(8px);
+      padding: 2.4rem 2.2rem 2.6rem;
+      border-radius: 40px;
+      box-shadow: 0 25px 50px -12px rgba(0, 20, 40, 0.3), 0 8px 24px -6px rgba(0, 0, 0, 0.05);
+      width: 100%;
+      max-width: 380px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      transition: 0.2s;
+    }
+
+    #loginBox h2 {
+      font-weight: 600;
+      font-size: 1.7rem;
+      letter-spacing: -0.02em;
+      color: #0b2a44;
+      margin-bottom: 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #loginBox label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #2e4b66;
+      margin: 1rem 0 0.25rem;
+    }
+
+    #loginBox input {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 1.5px solid #d8e2ed;
+      border-radius: 30px;
+      font-size: 0.95rem;
+      background: #ffffffcc;
+      backdrop-filter: blur(2px);
+      transition: 0.2s;
+    }
+
+    #loginBox input:focus {
+      border-color: #1f6390;
+      outline: none;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(31, 99, 144, 0.12);
+    }
+
+    #loginBox button {
+      width: 100%;
+      padding: 0.8rem;
+      margin-top: 1.2rem;
+      background: #1f6390;
+      color: #fff;
+      border: none;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 8px 18px -6px rgba(26, 67, 113, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    #loginBox button:hover {
+      background: #134a6b;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px -8px rgba(19, 74, 107, 0.4);
+    }
+
+    #loginError {
+      color: #b13e3e;
+      font-size: 0.8rem;
+      min-height: 20px;
+      margin: 4px 0 0;
+      font-weight: 500;
+    }
+
+    /* ----- app shell ----- */
+    #app {
+      display: none;
+      height: 100vh;
+      background: #f4f7fc;
+    }
+
+    #appWrap {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* sidebar — glass + rounded */
+    #sidebar {
+      width: 230px;
+      background: rgba(11, 26, 42, 0.92);
+      backdrop-filter: blur(6px);
+      color: #d3e2f2;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+    }
+
+    #sidebar .brand {
+      padding: 1.4rem 1.2rem 0.8rem;
+      font-weight: 700;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+      color: #eef6ff;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #sidebar .brand i {
+      color: #6ea8d9;
+      font-size: 1.3rem;
+    }
+
+    #sidebar .userinfo {
+      padding: 0.9rem 1.2rem 0.6rem;
+      font-size: 0.75rem;
+      color: #a7bbd0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    #propSwitcher {
+      width: 100%;
+      margin-top: 6px;
+      padding: 5px 12px;
+      border-radius: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.04);
+      color: #dce9f5;
+      font-size: 0.7rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    #propSwitcher:focus {
+      outline: none;
+      border-color: #5f8db6;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    #navList {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.8rem 0.2rem 0.6rem 0;
+    }
+
+    .navitem {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0.5rem 1.4rem;
+      margin: 0.1rem 0.6rem 0.1rem 0.6rem;
+      border-radius: 60px 0 0 60px;
+      color: #bbd1e5;
+      font-weight: 500;
+      font-size: 0.85rem;
+      transition: 0.15s;
+      border-left: 3px solid transparent;
+    }
+
+    .navitem i {
+      width: 1.2rem;
+      font-size: 1rem;
+      color: #7d9bb8;
+    }
+
+    .navitem:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #eaf3fc;
+    }
+
+    .navitem.active {
+      background: rgba(31, 99, 144, 0.3);
+      color: #fff;
+      border-left-color: #6ea8d9;
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.04);
+    }
+
+    .navitem.active i {
+      color: #aacfef;
+    }
+
+    #logoutBtn {
+      margin: 0.6rem 0.8rem 1.2rem 0.8rem;
+      padding: 0.6rem;
+      background: rgba(255, 255, 255, 0.06);
+      color: #f0f7fe;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    #logoutBtn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    /* main area — softer */
+    #main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2rem 2.5rem 3rem;
+      background: #f4f7fc;
+    }
+
+    h1.pagetitle {
+      font-weight: 600;
+      font-size: 1.8rem;
+      letter-spacing: -0.02em;
+      color: #0b2a44;
+      margin: 0 0 1.4rem 0;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    h1.pagetitle i {
+      color: #1f6390;
+      font-size: 1.5rem;
+      background: rgba(31, 99, 144, 0.08);
+      padding: 8px;
+      border-radius: 16px;
+    }
+
+    /* cards — elevated soft */
+    .card {
+      background: #ffffffdd;
+      backdrop-filter: blur(4px);
+      border-radius: 28px;
+      padding: 1.4rem 1.8rem;
+      margin-bottom: 1.8rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.02), 0 2px 6px rgba(0, 0, 0, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      transition: 0.15s;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1.5rem;
+    }
+
+    .toolbar input,
+    .toolbar select {
+      padding: 0.5rem 1.2rem;
+      border: 1.5px solid #d8e2ed;
+      border-radius: 60px;
+      font-size: 0.85rem;
+      background: #ffffffcc;
+      backdrop-filter: blur(2px);
+      transition: 0.15s;
+    }
+
+    .toolbar input:focus,
+    .toolbar select:focus {
+      border-color: #1f6390;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(31, 99, 144, 0.08);
+      background: white;
+    }
+
+    .btn {
+      padding: 0.5rem 1.3rem;
+      border: none;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      background: #1f6390;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 10px -2px rgba(31, 99, 144, 0.2);
+    }
+
+    .btn i {
+      font-size: 0.9rem;
+    }
+
+    .btn:hover {
+      background: #134a6b;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px -4px rgba(19, 74, 107, 0.25);
+    }
+
+    .btn.small {
+      padding: 0.2rem 0.9rem;
+      font-size: 0.7rem;
+      border-radius: 40px;
+    }
+
+    .btn.gray {
+      background: #cbd8e8;
+      color: #1d3347;
+      box-shadow: none;
+    }
+
+    .btn.gray:hover {
+      background: #b6c6da;
+      transform: translateY(-1px);
+    }
+
+    .btn.red {
+      background: #c0392b;
+      box-shadow: 0 4px 10px -2px rgba(192, 57, 43, 0.25);
+    }
+
+    .btn.red:hover {
+      background: #a83226;
+    }
+
+    .btn.green {
+      background: #1f8b4c;
+      box-shadow: 0 4px 10px -2px rgba(31, 139, 76, 0.25);
+    }
+
+    .btn.green:hover {
+      background: #16733d;
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      pointer-events: none;
+      filter: grayscale(0.3);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.6rem 0.4rem 0.6rem 0;
+      font-weight: 600;
+      color: #2a4a63;
+      border-bottom: 1.5px solid #e2eaf2;
+      text-transform: uppercase;
+      font-size: 0.65rem;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 0.7rem 0.4rem 0.7rem 0;
+      border-bottom: 1px solid #eef3f8;
+      vertical-align: middle;
+    }
+
+    tr:hover td {
+      background: #f8fafd;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.8rem;
+      border-radius: 60px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: capitalize;
+      letter-spacing: 0.02em;
+      color: #fff;
+    }
+
+    .b-pending_payment {
+      background: #d48c2b;
+    }
+    .b-confirmed {
+      background: #1f8b4c;
+    }
+    .b-checked_in {
+      background: #1f6390;
+    }
+    .b-checked_out {
+      background: #5b6f82;
+    }
+    .b-cancelled {
+      background: #b13e3e;
+    }
+    .b-no_show {
+      background: #7c3a3a;
+    }
+    .b-expired {
+      background: #8a9aaa;
+    }
+    .b-new {
+      background: #1f6390;
+    }
+    .b-contacted {
+      background: #d48c2b;
+    }
+    .b-closed {
+      background: #5b6f82;
+    }
+    .b-active {
+      background: #1f8b4c;
+    }
+    .b-maintenance {
+      background: #d48c2b;
+    }
+    .b-out_of_service {
+      background: #b13e3e;
+    }
+    .b-completed {
+      background: #1f8b4c;
+    }
+    .b-requested {
+      background: #d48c2b;
+    }
+    .b-rejected {
+      background: #b13e3e;
+    }
+    .b-initiated,
+    .b-pending {
+      background: #d48c2b;
+    }
+    .b-failed {
+      background: #b13e3e;
+    }
+
+    .muted {
+      color: #6f8aa3;
+      font-size: 0.8rem;
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 6px 20px;
+      font-size: 0.85rem;
+    }
+
+    .kv .k {
+      color: #2a4a63;
+      font-weight: 500;
+    }
+
+    .section-sub {
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.8rem 0;
+      color: #1a3850;
+      border-bottom: 1px solid #e2eaf2;
+      padding-bottom: 8px;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .gallery-card {
+      background: #fff;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid #eef3f8;
+      transition: 0.1s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+    }
+
+    .gallery-card img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      background: #eef3f8;
+    }
+
+    .gallery-card .body {
+      padding: 0.6rem 0.8rem 0.8rem;
+      font-size: 0.8rem;
+    }
+
+    .thumb {
+      width: 60px;
+      height: 45px;
+      object-fit: cover;
+      border-radius: 12px;
+      background: #eef3f8;
+    }
+
+    /* modal — glass */
+    #modalOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 26, 42, 0.4);
+      backdrop-filter: blur(6px);
+      align-items: flex-start;
+      justify-content: center;
+      overflow-y: auto;
+      z-index: 60;
+      padding: 1.5rem;
+    }
+
+    #modalBox {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      border-radius: 40px;
+      padding: 1.8rem 2.2rem 2rem;
+      margin: 2rem 0;
+      width: 540px;
+      max-width: 100%;
+      box-shadow: 0 40px 70px -20px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      animation: modalFade 0.2s ease;
+    }
+
+    @keyframes modalFade {
+      0% {
+        opacity: 0;
+        transform: scale(0.96);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    #modalBox h2 {
+      font-weight: 600;
+      font-size: 1.4rem;
+      color: #0b2a44;
+      margin-top: 0.2rem;
+      margin-bottom: 0.8rem;
+    }
+
+    #modalBox label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: #2a4a63;
+      margin: 0.9rem 0 0.2rem;
+    }
+
+    #modalBox input,
+    #modalBox select,
+    #modalBox textarea {
+      width: 100%;
+      padding: 0.6rem 1rem;
+      border: 1.5px solid #d8e2ed;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      background: #ffffffcc;
+      transition: 0.15s;
+      font-family: inherit;
+    }
+
+    #modalBox input:focus,
+    #modalBox select:focus,
+    #modalBox textarea:focus {
+      border-color: #1f6390;
+      outline: none;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(31, 99, 144, 0.06);
+    }
+
+    #modalBox textarea {
+      min-height: 70px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+    }
+
+    .close-x {
+      float: right;
+      font-size: 1.5rem;
+      font-weight: 300;
+      color: #7b96af;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .close-x:hover {
+      color: #1a3850;
+    }
+
+    .modal-actions {
+      margin-top: 1.6rem;
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .field-error {
+      color: #b13e3e;
+      font-size: 0.75rem;
+      margin-top: 6px;
+      min-height: 20px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: #0b1a2a;
+      color: #ecf5fd;
+      padding: 0.8rem 1.8rem;
+      border-radius: 60px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      z-index: 80;
+      box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: slideUp 0.25s ease;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .toast i {
+      font-size: 1rem;
+    }
+
+    @keyframes slideUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 1.2rem;
+      height: 1.2rem;
+      border: 2.5px solid rgba(31, 99, 144, 0.15);
+      border-top: 2.5px solid #1f6390;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    .spinner-white {
+      border: 2.5px solid rgba(255, 255, 255, 0.2);
+      border-top: 2.5px solid #fff;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-placeholder {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #2a4a63;
+      padding: 1.2rem 0;
+    }
+
+    .btn .spinner {
+      width: 0.9rem;
+      height: 0.9rem;
+      border-width: 2px;
+      margin-right: 4px;
+    }
+
+    /* property settings card */
+    #main .card label {
+      font-weight: 600;
+      font-size: 0.75rem;
+      color: #2a4a63;
+      margin-top: 0.8rem;
+      display: block;
+    }
+
+    #main .card input {
+      width: 100%;
+      padding: 0.5rem 1rem;
+      border: 1.5px solid #d8e2ed;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      background: #ffffffcc;
+      transition: 0.15s;
+    }
+
+    #main .card input:focus {
+      border-color: #1f6390;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(31, 99, 144, 0.06);
+      background: white;
+    }
+  </style>
+</head>
+<body>
+  <!-- ========== LOGIN ========== -->
+  <div id="loginScreen">
+    <div id="loginBox">
+      <h2><i class="fas fa-hotel" style="color:#1f6390;"></i> Admin</h2>
+      <div id="loginError"></div>
+      <label>Base URL</label>
+      <input id="baseUrlInput" value="http://localhost:4000/api/v1" />
+      <label>Email</label>
+      <input id="loginEmail" value="admin@centurion.com" />
+      <label>Password</label>
+      <input id="loginPassword" type="password" value="Password123!" />
+      <button onclick="doLogin()"><i class="fas fa-arrow-right-to-bracket"></i> Log In</button>
+    </div>
+  </div>
+
+  <!-- ========== APP ========== -->
+  <div id="app">
+    <div id="appWrap">
+      <div id="sidebar">
+        <div class="brand"><i class="fas fa-building"></i> Booking Admin</div>
+        <div class="userinfo" id="userInfoBox"></div>
+        <div id="navList"></div>
+        <button id="logoutBtn" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Log Out</button>
+      </div>
+      <div id="main"></div>
+    </div>
+  </div>
+
+  <!-- ========== MODAL ========== -->
+  <div id="modalOverlay">
+    <div id="modalBox"></div>
+  </div>
+  <div id="toastHost"></div>
+
+  <script>
+    /* =========================================================
+       STATE (unchanged)
+       ========================================================= */
+    const PROPERTIES = [
+      { id: 'b3ac1eab-5b2d-4e2a-9c1a-111111111111', slug: 'centurion-hotel', name: 'Centurion Hotel' },
+      { id: 'd7f2c9a4-8e31-4b7a-9f2e-222222222222', slug: 'mums-garden-resort', name: "Mum's Garden Resort" }
+    ];
+
+    const state = {
+      baseUrl: '',
+      accessToken: '',
+      refreshToken: '',
+      role: null,
+      userPropertyId: null,
+      selectedPropertyId: PROPERTIES[0].id,
+      currentView: 'dashboard',
+      cache: {}
+    };
+
+    const BOOKING_TRANSITIONS = {
+      pending_payment: ['confirmed', 'cancelled'],
+      confirmed: ['checked_in', 'cancelled', 'no_show'],
+      checked_in: ['checked_out'],
+      checked_out: [],
+      cancelled: [],
+      no_show: [],
+      expired: []
+    };
+
+    /* =========================================================
+       API HELPER (unchanged)
+       ========================================================= */
+    function decodeJwt(token) {
+      try { const p = token.split('.')[1]; return JSON.parse(atob(p.replace(/-/g, '+').replace(/_/g, '/'))); } catch (e) { return null; }
+    }
+
+    async function rawRequest(method, path, { query, body, isForm } = {}) {
+      let url = state.baseUrl + path;
+      const q = Object.entries(query || {}).filter(([k, v]) => v !== undefined && v !== null && v !== '');
+      if (q.length) url += '?' + q.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+      const headers = {};
+      if (state.accessToken) headers['Authorization'] = 'Bearer ' + state.accessToken;
+      const opts = { method, headers };
+      if (isForm) { opts.body = body; } else if (body !== undefined) { headers['Content-Type'] = 'application/json';
+        opts.body = JSON.stringify(body); }
+      const res = await fetch(url, opts);
+      let data = null;
+      try { data = await res.json(); } catch (e) {}
+      return { status: res.status, data };
+    }
+
+    async function api(method, path, opts = {}, _retried = false) {
+      const { status, data } = await rawRequest(method, path, opts);
+      if (status === 401 && state.refreshToken && !_retried) {
+        const refreshRes = await rawRequest('POST', '/auth/refresh', { body: { refreshToken: state.refreshToken } });
+        if (refreshRes.status === 200 && refreshRes.data && refreshRes.data.success) {
+          state.accessToken = refreshRes.data.data.accessToken;
+          state.refreshToken = refreshRes.data.data.refreshToken;
+          return api(method, path, opts, true);
+        }
+        doLogout();
+        throw new Error('Session expired - please log in again.');
+      }
+      if (!data || data.success !== true) {
+        const msg = (data && data.error && data.error.message) || `Request failed (${status})`;
+        throw new Error(msg);
+      }
+      return data;
+    }
+
+    function adminQuery(extra = {}) {
+      const q = { ...extra };
+      if (state.role === 'superadmin') q.propertyId = state.selectedPropertyId;
+      return q;
+    }
+
+    /* =========================================================
+       UTILITIES (unchanged)
+       ========================================================= */
+    function esc(str) {
+      if (str === null || str === undefined) return '';
+      return String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    function money(n) { return n === null || n === undefined ? '-' : Number(n).toLocaleString(undefined, { minimumFractionDigits: 2,
+        maximumFractionDigits: 2 }); }
+
+    function fmtDate(d) { if (!d) return '-'; return new Date(d).toLocaleDateString(); }
+
+    function fmtDateTime(d) { if (!d) return '-'; return new Date(d).toLocaleString(); }
+
+    function badge(status) { return `<span class="badge b-${status}">${status}</span>`; }
+
+    function toast(msg, isError) {
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.style.background = isError ? '#b13e3e' : '#0b1a2a';
+      el.innerHTML = `<i class="fas ${isError ? 'fa-circle-exclamation' : 'fa-circle-check'}"></i> ${esc(msg)}`;
+      document.getElementById('toastHost').appendChild(el);
+      setTimeout(() => el.remove(), 3500);
+    }
+
+    function setMain(html) { document.getElementById('main').innerHTML = html; }
+
+    function openModal(html) {
+      document.getElementById('modalBox').innerHTML = html;
+      document.getElementById('modalOverlay').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
+
+    /* =========================================================
+       AUTH (unchanged)
+       ========================================================= */
+    async function doLogin() {
+      state.baseUrl = document.getElementById('baseUrlInput').value.replace(/\/$/, '');
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      document.getElementById('loginError').textContent = '';
+      const btn = document.querySelector('#loginBox button');
+      btn.innerHTML = '<span class="spinner spinner-white"></span> Logging…';
+      btn.disabled = true;
+      try {
+        const res = await rawRequest('POST', '/auth/login', { body: { email, password } });
+        if (res.status !== 200 || !res.data || !res.data.success) {
+          throw new Error((res.data && res.data.error && res.data.error.message) || 'Login failed.');
+        }
+        state.accessToken = res.data.data.accessToken;
+        state.refreshToken = res.data.data.refreshToken;
+        const payload = decodeJwt(state.accessToken);
+        state.role = payload.role;
+        state.userPropertyId = payload.propertyId;
+        if (state.userPropertyId) state.selectedPropertyId = state.userPropertyId;
+
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        renderShell();
+        navigate('dashboard');
+      } catch (err) {
+        document.getElementById('loginError').textContent = err.message;
+        btn.innerHTML = '<i class="fas fa-arrow-right-to-bracket"></i> Log In';
+        btn.disabled = false;
+      }
+    }
+
+    function doLogout() {
+      state.accessToken = '';
+      state.refreshToken = '';
+      state.role = null;
+      document.getElementById('app').style.display = 'none';
+      document.getElementById('loginScreen').style.display = 'flex';
+    }
+
+    /* =========================================================
+       SHELL / NAV (unchanged)
+       ========================================================= */
+    const NAV = [
+      { key: 'dashboard', label: 'Dashboard', icon: 'fa-gauge-high', roles: ['staff', 'admin', 'superadmin'] },
+      { key: 'bookings', label: 'Bookings', icon: 'fa-calendar-check', roles: ['staff', 'admin', 'superadmin'] },
+      { key: 'roomtypes', label: 'Room Types', icon: 'fa-door-open', roles: ['staff', 'admin', 'superadmin'] },
+      { key: 'rooms', label: 'Physical Rooms', icon: 'fa-bed', roles: ['staff', 'admin', 'superadmin'] },
+      { key: 'rateplans', label: 'Rate Plans', icon: 'fa-tags', roles: ['admin', 'superadmin'] },
+      { key: 'policies', label: 'Cancellation Policies', icon: 'fa-file-contract', roles: ['admin', 'superadmin'] },
+      { key: 'offers', label: 'Offers', icon: 'fa-gift', roles: ['staff', 'admin', 'superadmin'] },
+      { key: 'eventtypes', label: 'Event Types', icon: 'fa-calendar-plus', roles: ['staff', 'admin', 'superadmin'] },
+      { key: 'gallery', label: 'Gallery', icon: 'fa-images', roles: ['staff', 'admin', 'superadmin'] },
+      { key: 'inquiries', label: 'Inquiries', icon: 'fa-message', roles: ['staff', 'admin', 'superadmin'] },
+      { key: 'staff', label: 'Staff Accounts', icon: 'fa-users-gear', roles: ['superadmin'] },
+      { key: 'reports', label: 'Reports', icon: 'fa-chart-simple', roles: ['admin', 'superadmin'] },
+      { key: 'settings', label: 'Property Settings', icon: 'fa-sliders', roles: ['admin', 'superadmin'] }
+    ];
+
+    function renderShell() {
+      const userBox = document.getElementById('userInfoBox');
+      let propSwitcherHtml = '';
+      if (state.role === 'superadmin') {
+        propSwitcherHtml = `<select id="propSwitcher" onchange="onPropertyChange(this.value)">
+          ${PROPERTIES.map(p => `<option value="${p.id}" ${p.id === state.selectedPropertyId ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}
+        </select>`;
+      } else {
+        const p = PROPERTIES.find(p => p.id === state.userPropertyId);
+        propSwitcherHtml = `<div style="margin-top:4px;font-weight:400;">${p ? esc(p.name) : 'No property'}</div>`;
+      }
+      userBox.innerHTML = `<i class="fas fa-user-shield"></i> <b>${state.role}</b> ${propSwitcherHtml}`;
+
+      const navList = document.getElementById('navList');
+      navList.innerHTML = NAV.filter(item => item.roles.includes(state.role)).map(item =>
+        `<a class="navitem" data-key="${item.key}" onclick="navigate('${item.key}')">
+          <i class="fas ${item.icon}"></i> ${item.label}
+        </a>`
+      ).join('');
+    }
+
+    function onPropertyChange(id) {
+      state.selectedPropertyId = id;
+      navigate(state.currentView);
+    }
+
+    function navigate(key) {
+      state.currentView = key;
+      document.querySelectorAll('.navitem').forEach(el => el.classList.toggle('active', el.dataset.key === key));
+      const viewFns = {
+        dashboard: viewDashboard,
+        bookings: viewBookings,
+        roomtypes: viewRoomTypes,
+        rooms: viewRooms,
+        rateplans: viewRatePlans,
+        policies: viewPolicies,
+        offers: viewOffers,
+        eventtypes: viewEventTypes,
+        gallery: viewGallery,
+        inquiries: viewInquiries,
+        staff: viewStaff,
+        reports: viewReports,
+        settings: viewSettings
+      };
+      (viewFns[key] || viewDashboard)();
+    }
+
+    /* =========================================================
+       DASHBOARD (unchanged)
+       ========================================================= */
+    async function viewDashboard() {
+      setMain(
+        `<h1 class="pagetitle"><i class="fas fa-gauge-high"></i> Dashboard</h1><div class="loading-placeholder"><span class="spinner"></span> Loading metrics…</div>`
+        );
+      try {
+        const bookingsRes = await api('GET', '/admin/bookings', { query: adminQuery({ pageSize: 5 }) });
+        const pendingRes = await api('GET', '/admin/bookings', { query: adminQuery({ status: 'pending_payment',
+            pageSize: 1 }) });
+        const confirmedRes = await api('GET', '/admin/bookings', { query: adminQuery({ status: 'confirmed',
+          pageSize: 1 }) });
+        setMain(`
+          <h1 class="pagetitle"><i class="fas fa-gauge-high"></i> Dashboard</h1>
+          <div style="display:flex; gap:1rem; margin-bottom:1.5rem; flex-wrap:wrap;">
+            <div class="card" style="flex:1; min-width:140px;"><div class="muted"><i class="fas fa-calendar-check"></i> Total bookings</div><h2 style="margin:6px 0 0 0;">${bookingsRes.meta.total}</h2></div>
+            <div class="card" style="flex:1; min-width:140px;"><div class="muted"><i class="fas fa-clock"></i> Pending payment</div><h2 style="margin:6px 0 0 0;">${pendingRes.meta.total}</h2></div>
+            <div class="card" style="flex:1; min-width:140px;"><div class="muted"><i class="fas fa-check-circle"></i> Confirmed</div><h2 style="margin:6px 0 0 0;">${confirmedRes.meta.total}</h2></div>
+          </div>
+          <div class="card">
+            <div class="section-sub" style="margin-top:0;">Recent bookings</div>
+            ${bookingTable(bookingsRes.data, false)}
+          </div>
+        `);
+      } catch (err) {
+        setMain(`<h1 class="pagetitle"><i class="fas fa-gauge-high"></i> Dashboard</h1><p style="color:#b13e3e;"><i class="fas fa-triangle-exclamation"></i> ${esc(err.message)}</p>`);
+      }
+    }
+
+    function bookingTable(rows, withActions) {
+      if (!rows.length) return '<p class="muted">No bookings found.</p>';
+      return `<table><thead><tr>
+        <th>Code</th><th>Guest</th><th>Dates</th><th>Status</th><th>Paid / Total</th>${withActions ? '<th></th>' : ''}
+      </tr></thead><tbody>
+        ${rows.map(b => `<tr>
+          <td><strong>${esc(b.bookingCode)}</strong></td>
+          <td>${esc(b.guestFirstName)} ${esc(b.guestLastName)}<br><span class="muted">${esc(b.guestEmail)}</span></td>
+          <td>${fmtDate(b.checkInDate)} → ${fmtDate(b.checkOutDate)}</td>
+          <td>${badge(b.status)}</td>
+          <td>${money(b.amountPaid)} / ${money(b.subtotal)}</td>
+          ${withActions ? `<td><button class="btn small" onclick="openBookingDetail('${b.id}')"><i class="fas fa-eye"></i> View</button></td>` : ''}
+        </tr>`).join('')}
+      </tbody></table>`;
+    }
+
+    let bookingFilters = { status: '', search: '', page: 1 };
+
+    async function viewBookings() {
+      setMain(
+        `<h1 class="pagetitle"><i class="fas fa-calendar-check"></i> Bookings</h1><div class="loading-placeholder"><span class="spinner"></span> Loading bookings…</div>`
+        );
+      await loadBookingsList();
+    }
+
+    async function loadBookingsList() {
+      try {
+        const res = await api('GET', '/admin/bookings', {
+          query: adminQuery({ status: bookingFilters.status, search: bookingFilters.search, page: bookingFilters.page,
+            pageSize: 20 })
+        });
+        setMain(`
+          <h1 class="pagetitle"><i class="fas fa-calendar-check"></i> Bookings</h1>
+          <div class="toolbar">
+            <input id="bkSearch" placeholder="Search name/email/phone/code" value="${esc(bookingFilters.search)}" style="flex:1; min-width:180px;">
+            <select id="bkStatus">
+              <option value="">All statuses</option>
+              ${['pending_payment', 'confirmed', 'checked_in', 'checked_out', 'cancelled', 'no_show', 'expired']
+                .map(s => `<option value="${s}" ${bookingFilters.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+            </select>
+            <button class="btn" onclick="applyBookingFilters()"><i class="fas fa-filter"></i> Filter</button>
+            <button class="btn green" onclick="openManualBookingForm()"><i class="fas fa-plus"></i> Walk-in</button>
+          </div>
+          <div class="card">
+            ${bookingTable(res.data, true)}
+            <div class="muted" style="margin-top:10px;">Total: ${res.meta.total} · page ${res.meta.page}</div>
+            <div style="margin-top:8px; display:flex; gap:6px;">
+              <button class="btn gray small" onclick="changeBookingPage(-1)" ${bookingFilters.page <= 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i> Prev</button>
+              <button class="btn gray small" onclick="changeBookingPage(1)" ${res.data.length < 20 ? 'disabled' : ''}>Next <i class="fas fa-chevron-right"></i></button>
+            </div>
+          </div>
+        `);
+      } catch (err) {
+        setMain(`<h1 class="pagetitle"><i class="fas fa-calendar-check"></i> Bookings</h1><p style="color:#b13e3e;"><i class="fas fa-triangle-exclamation"></i> ${esc(err.message)}</p>`);
+      }
+    }
+
+    function applyBookingFilters() {
+      bookingFilters.search = document.getElementById('bkSearch').value;
+      bookingFilters.status = document.getElementById('bkStatus').value;
+      bookingFilters.page = 1;
+      loadBookingsList();
+    }
+
+    function changeBookingPage(delta) {
+      bookingFilters.page += delta;
+      loadBookingsList();
+    }
+
+    /* =========================================================
+       BOOKING DETAIL + MODAL (unchanged)
+       ========================================================= */
+    async function openBookingDetail(id) {
+      openModal(`<div class="loading-placeholder"><span class="spinner"></span> Loading booking…</div>`);
+      try {
+        const [bookingRes, paymentsRes] = await Promise.all([
+          api('GET', `/admin/bookings/${id}`, { query: adminQuery() }),
+          api('GET', '/admin/payments', { query: adminQuery({ bookingId: id }) })
+        ]);
+        const b = bookingRes.data;
+        const payments = paymentsRes.data;
+        const allowed = BOOKING_TRANSITIONS[b.status] || [];
+
+        openModal(`
+          <span class="close-x" onclick="closeModal()">&times;</span>
+          <h2><i class="fas fa-receipt" style="color:#1f6390;"></i> ${esc(b.bookingCode)} ${badge(b.status)}</h2>
+          <div class="kv">
+            <div class="k">Guest</div><div>${esc(b.guestFirstName)} ${esc(b.guestLastName)} — ${esc(b.guestEmail)} ${b.guestPhone ? '· ' + esc(b.guestPhone) : ''}</div>
+            <div class="k">Dates</div><div>${fmtDate(b.checkInDate)} → ${fmtDate(b.checkOutDate)} (${b.numAdults} A, ${b.numChildren} C, ${b.numRooms} rooms)</div>
+            <div class="k">Subtotal</div><div>${money(b.subtotal)} ${b.currency}</div>
+            <div class="k">Deposit required</div><div>${money(b.depositRequired)}</div>
+            <div class="k">Paid / Balance</div><div>${money(b.amountPaid)} / ${money(b.balanceDue)}</div>
+            <div class="k">Cancellation deadline</div><div>${fmtDateTime(b.cancellationDeadlineAt)}</div>
+            <div class="k">Special requests</div><div>${esc(b.specialRequests || '-')}</div>
+          </div>
+
+          <div class="section-sub"><i class="fas fa-arrow-right-arrow-left"></i> Status actions</div>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;">
+            ${allowed.length === 0 ? '<span class="muted">No further transitions available.</span>' :
+              allowed.map(s => `<button class="btn small ${s === 'cancelled' || s === 'no_show' ? 'red' : 'green'}" onclick="changeBookingStatus('${b.id}','${s}')">${s.replace('_', ' ')}</button>`).join(' ')}
+          </div>
+
+          <div class="section-sub"><i class="fas fa-door-open"></i> Assign room</div>
+          <div style="display:flex; gap:8px;">
+            <input id="assignRoomId" placeholder="Room ID (from Physical Rooms)" style="flex:1;">
+            <button class="btn small" onclick="assignRoom('${b.id}')"><i class="fas fa-check"></i> Assign</button>
+          </div>
+
+          <div class="section-sub"><i class="fas fa-credit-card"></i> Payments</div>
+          ${payments.length === 0 ? '<p class="muted">No payments yet.</p>' :
+            payments.map(p => `
+              <div style="border:1px solid #e2eaf2; border-radius:16px; padding:8px 12px; margin-bottom:8px;">
+                <div><strong>${esc(p.type)}</strong> · ${money(p.amount)} ${p.currency} ${badge(p.status)}</div>
+                <div class="muted">${p.provider} ${p.mpesaReceiptNumber ? '· receipt ' + esc(p.mpesaReceiptNumber) : ''}</div>
+                ${p.status === 'completed' ? `
+                  <div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:6px;">
+                    <input id="refundAmt-${p.id}" placeholder="Refund amount" style="width:110px; padding:4px 8px; border-radius:30px; border:1px solid #dde5ed;">
+                    <input id="refundReason-${p.id}" placeholder="Reason" style="width:150px; padding:4px 8px; border-radius:30px; border:1px solid #dde5ed;">
+                    <button class="btn small red" onclick="requestRefund('${p.id}')"><i class="fas fa-rotate-left"></i> Refund</button>
+                  </div>` : ''}
+              </div>
+            `).join('')
+          }
+          <div id="refundResultBox"></div>
+
+          <div class="modal-actions"><button class="btn gray" onclick="closeModal()">Close</button></div>
+        `);
+      } catch (err) {
+        openModal(`<span class="close-x" onclick="closeModal()">&times;</span><p style="color:#b13e3e;"><i class="fas fa-triangle-exclamation"></i> ${esc(err.message)}</p>`);
+      }
+    }
+
+    async function changeBookingStatus(id, status) {
+      try {
+        await api('PATCH', `/admin/bookings/${id}/status`, { query: adminQuery(), body: { status } });
+        toast('Booking updated to ' + status);
+        closeModal();
+        loadBookingsList();
+      } catch (err) { toast(err.message, true); }
+    }
+
+    async function assignRoom(bookingId) {
+      const roomId = document.getElementById('assignRoomId').value.trim();
+      if (!roomId) { toast('Enter a room ID first.', true); return; }
+      try {
+        await api('POST', `/admin/bookings/${bookingId}/assign-room`, { query: adminQuery(), body: { roomId } });
+        toast('Room assigned.');
+        openBookingDetail(bookingId);
+      } catch (err) { toast(err.message, true); }
+    }
+
+    async function requestRefund(paymentId) {
+      const amount = document.getElementById(`refundAmt-${paymentId}`).value;
+      const reason = document.getElementById(`refundReason-${paymentId}`).value;
+      if (!amount || !reason) { toast('Amount and reason are required.', true); return; }
+      try {
+        const res = await api('POST', `/admin/payments/${paymentId}/refund`, { query: adminQuery(), body: { amount: Number(
+              amount), reason } });
+        const r = res.data;
+        document.getElementById('refundResultBox').innerHTML = `
+          <div class="card" style="margin-top:10px;">
+            Refund ${badge(r.status)} for ${money(r.amount)} —
+            <button class="btn small green" onclick="updateRefundStatus('${r.id}','completed', this)"><i class="fas fa-check"></i> Mark complete</button>
+            <button class="btn small red" onclick="updateRefundStatus('${r.id}','rejected', this)"><i class="fas fa-times"></i> Reject</button>
+          </div>`;
+      } catch (err) { toast(err.message, true); }
+    }
+
+    async function updateRefundStatus(refundId, status, btnEl) {
+      try {
+        await api('PATCH', `/admin/refunds/${refundId}/status`, { query: adminQuery(), body: { status } });
+        toast('Refund ' + status);
+        btnEl.closest('.card').innerHTML = `Refund ${badge(status)}`;
+      } catch (err) { toast(err.message, true); }
+    }
+
+    /* =========================================================
+       WALK-IN BOOKING (unchanged)
+       ========================================================= */
+    async function openManualBookingForm() {
+      openModal(
+        `<div class="loading-placeholder"><span class="spinner"></span> Loading room types…</div>`);
+      try {
+        const rtRes = await api('GET', '/admin/room-types', { query: adminQuery({ pageSize: 100 }) });
+        const options = rtRes.data.map(rt => `<option value="${rt.id}">${esc(rt.name)} (${money(rt.basePrice)})</option>`)
+        .join('');
+        openModal(`
+          <span class="close-x" onclick="closeModal()">&times;</span>
+          <h2><i class="fas fa-user-plus"></i> Walk-in Booking</h2>
+          <label>Room Type</label>
+          <select id="mb-roomTypeId">${options}</select>
+          <label>Check-in</label><input id="mb-checkIn" type="date">
+          <label>Check-out</label><input id="mb-checkOut" type="date">
+          <label>Guest first name</label><input id="mb-firstName">
+          <label>Guest last name</label><input id="mb-lastName">
+          <label>Guest email</label><input id="mb-email">
+          <label>Guest phone</label><input id="mb-phone">
+          <label>Payment collected</label>
+          <select id="mb-payment"><option value="none">None yet</option><option value="cash">Cash</option><option value="mpesa">M-Pesa</option></select>
+          <div class="field-error" id="mb-error"></div>
+          <div class="modal-actions">
+            <button class="btn gray" onclick="closeModal()">Cancel</button>
+            <button class="btn green" onclick="submitManualBooking()"><i class="fas fa-save"></i> Create</button>
+          </div>
+        `);
+      } catch (err) {
+        openModal(`<span class="close-x" onclick="closeModal()">&times;</span><p style="color:#b13e3e;">${esc(err.message)}</p>`);
+      }
+    }
+
+    async function submitManualBooking() {
+      const body = {
+        roomTypeId: document.getElementById('mb-roomTypeId').value,
+        checkInDate: document.getElementById('mb-checkIn').value,
+        checkOutDate: document.getElementById('mb-checkOut').value,
+        guestFirstName: document.getElementById('mb-firstName').value,
+        guestLastName: document.getElementById('mb-lastName').value,
+        guestEmail: document.getElementById('mb-email').value,
+        guestPhone: document.getElementById('mb-phone').value,
+        paymentCollected: document.getElementById('mb-payment').value
+      };
+      try {
+        await api('POST', '/admin/bookings/manual', { query: adminQuery(), body });
+        toast('Booking created.');
+        closeModal();
+        loadBookingsList();
+      } catch (err) { document.getElementById('mb-error').textContent = err.message; }
+    }
+
+    /* =========================================================
+       ROOM TYPES (unchanged)
+       ========================================================= */
+    async function viewRoomTypes() {
+      setMain(
+        `<h1 class="pagetitle"><i class="fas fa-door-open"></i> Room Types</h1><div class="loading-placeholder"><span class="spinner"></span> Loading…</div>`
+        );
+      try {
+        const res = await api('GET', '/admin/room-types', { query: adminQuery({ pageSize: 100 }) });
+        state.cache.roomTypes = res.data;
+        setMain(`
+          <h1 class="pagetitle"><i class="fas fa-door-open"></i> Room Types</h1>
+          <div class="toolbar"><button class="btn green" onclick="openRoomTypeForm()"><i class="fas fa-plus"></i> New Room Type</button></div>
+          <div class="card">
+            <table><thead><tr><th>Name</th><th>Bed</th><th>Occupancy</th><th>Units</th><th>Price</th><th>Active</th><th></th></tr></thead>
+            <tbody>
+              ${res.data.map(rt => `<tr>
+                <td><strong>${esc(rt.name)}</strong><br><span class="muted">${esc(rt.slug)}</span></td>
+                <td>${esc(rt.bedType || '-')}</td>
+                <td>${rt.maxAdults}A / ${rt.maxChildren}C</td>
+                <td>${rt.totalUnits}</td>
+                <td>${money(rt.basePrice)} ${esc(rt.currency)}</td>
+                <td>${rt.isActive ? badge('active') : badge('cancelled')}</td>
+                <td>
+                  <button class="btn small" onclick="openRoomTypeForm('${rt.id}')"><i class="fas fa-pen"></i></button>
+                  <button class="btn small" onclick="openRoomTypeImages('${rt.id}')"><i class="fas fa-image"></i></button>
+                  <button class="btn small red" onclick="deactivateRoomType('${rt.id}')"><i class="fas fa-ban"></i></button>
+                </td>
+              </tr>`).join('')}
+            </tbody></table>
+          </div>
+        `);
+      } catch (err) {
+        setMain(`<h1 class="pagetitle"><i class="fas fa-door-open"></i> Room Types</h1><p style="color:#b13e3e;">${esc(err.message)}</p>`);
+      }
+    }
+
+    function openRoomTypeForm(id) {
+      const rt = id ? (state.cache.roomTypes || []).find(r => r.id === id) : null;
+      openModal(`
+        <span class="close-x" onclick="closeModal()">&times;</span>
+        <h2>${rt ? 'Edit' : 'New'} Room Type</h2>
+        <label>Slug</label><input id="rt-slug" value="${rt ? esc(rt.slug) : ''}">
+        <label>Name</label><input id="rt-name" value="${rt ? esc(rt.name) : ''}">
+        <label>Description</label><textarea id="rt-desc" style="min-height:50px;">${rt ? esc(rt.description || '') : ''}</textarea>
+        <label>Bed type</label>
+        <select id="rt-bed">${['single', 'twin', 'double', 'queen', 'king', 'bunk'].map(b => `<option value="${b}" ${rt && rt.bedType === b ? 'selected' : ''}>${b}</option>`).join('')}</select>
+        <label>Max adults</label><input id="rt-adults" type="number" value="${rt ? rt.maxAdults : 2}">
+        <label>Max children</label><input id="rt-children" type="number" value="${rt ? rt.maxChildren : 0}">
+        <label>Total units</label><input id="rt-units" type="number" value="${rt ? rt.totalUnits : 1}">
+        <label>Base price</label><input id="rt-price" type="number" value="${rt ? rt.basePrice : ''}">
+        <div class="field-error" id="rt-error"></div>
+        <div class="modal-actions">
+          <button class="btn gray" onclick="closeModal()">Cancel</button>
+          <button class="btn green" onclick="submitRoomTypeForm(${rt ? `'${rt.id}'` : 'null'})"><i class="fas fa-save"></i> Save</button>
+        </div>
+      `);
+    }
+
+    async function submitRoomTypeForm(id) {
+      const body = {
+        slug: document.getElementById('rt-slug').value,
+        name: document.getElementById('rt-name').value,
+        description: document.getElementById('rt-desc').value,
+        bedType: document.getElementById('rt-bed').value,
+        maxAdults: Number(document.getElementById('rt-adults').value),
+        maxChildren: Number(document.getElementById('rt-children').value),
+        totalUnits: Number(document.getElementById('rt-units').value),
+        basePrice: Number(document.getElementById('rt-price').value)
+      };
+      try {
+        if (id) { await api('PATCH', `/admin/room-types/${id}`, { query: adminQuery(), body }); } else { await api('POST',
+            '/admin/room-types', { query: adminQuery(), body }); }
+        toast('Saved.');
+        closeModal();
+        viewRoomTypes();
+      } catch (err) { document.getElementById('rt-error').textContent = err.message; }
+    }
+
+    async function deactivateRoomType(id) {
+      if (!confirm('Deactivate this room type?')) return;
+      try {
+        await api('DELETE', `/admin/room-types/${id}`, { query: adminQuery() });
+        toast('Deactivated.');
+        viewRoomTypes();
+      } catch (err) { toast(err.message, true); }
+    }
+
+    /* =========================================================
+       ROOM TYPE IMAGES (unchanged)
+       ========================================================= */
+    async function openRoomTypeImages(roomTypeId) {
+      openModal(`<div class="loading-placeholder"><span class="spinner"></span> Loading images…</div>`);
+      try {
+        const res = await api('GET', `/admin/room-types/${roomTypeId}`, { query: adminQuery() });
+        renderRoomTypeImagesModal(res.data);
+      } catch (err) {
+        openModal(`<span class="close-x" onclick="closeModal()">&times;</span><p style="color:#b13e3e;">${esc(err.message)}</p>`);
+      }
+    }
+
+    function renderRoomTypeImagesModal(rt) {
+      openModal(`
+        <span class="close-x" onclick="closeModal()">&times;</span>
+        <h2><i class="fas fa-image"></i> ${esc(rt.name)}</h2>
+        <div class="gallery-grid">
+          ${rt.images.map(img => `
+            <div class="gallery-card">
+              <img src="${esc(img.url)}" onerror="this.style.opacity=0.3">
+              <div class="body">
+                ${img.isCover ? '<span class="badge b-active">cover</span>' : `<a onclick="setRoomTypeImageCover('${rt.id}','${img.id}')" style="color:#1f6390;">Set cover</a>`}
+                <br><a style="color:#b13e3e; font-size:0.75rem;" onclick="deleteRoomTypeImage('${rt.id}','${img.id}')">Delete</a>
+              </div>
+            </div>
+          `).join('') || '<p class="muted">No images yet.</p>'}
+        </div>
+        <div class="section-sub">Upload new</div>
+        <input type="file" id="rt-img-file" accept="image/jpeg,image/png,image/webp" style="margin-bottom:6px;">
+        <button class="btn small" onclick="uploadRoomTypeImage('${rt.id}')"><i class="fas fa-upload"></i> Upload</button>
+        <div class="field-error" id="rt-img-error"></div>
+        <div class="modal-actions"><button class="btn gray" onclick="closeModal()">Close</button></div>
+      `);
+    }
+
+    async function uploadRoomTypeImage(roomTypeId) {
+      const fileInput = document.getElementById('rt-img-file');
+      if (!fileInput.files.length) { document.getElementById('rt-img-error').textContent = 'Choose a file.'; return; }
+      try {
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        const uploadRes = await api('POST', '/admin/media/upload', { query: adminQuery(), body: formData, isForm: true });
+        await api('POST', `/admin/room-types/${roomTypeId}/images`, { query: adminQuery(), body: { url: uploadRes.data.url,
+            isCover: false } });
+        toast('Image added.');
+        const rtRes = await api('GET', `/admin/room-types/${roomTypeId}`, { query: adminQuery() });
+        renderRoomTypeImagesModal(rtRes.data);
+      } catch (err) { document.getElementById('rt-img-error').textContent = err.message; }
+    }
+
+    async function setRoomTypeImageCover(roomTypeId, imageId) {
+      try {
+        await api('PATCH', `/admin/room-types/${roomTypeId}/images/${imageId}`, { query: adminQuery(), body: { isCover: true } });
+        const rtRes = await api('GET', `/admin/room-types/${roomTypeId}`, { query: adminQuery() });
+        renderRoomTypeImagesModal(rtRes.data);
+      } catch (err) { toast(err.message, true); }
+    }
+
+    async function deleteRoomTypeImage(roomTypeId, imageId) {
+      if (!confirm('Delete this image?')) return;
+      try {
+        await api('DELETE', `/admin/room-types/${roomTypeId}/images/${imageId}`, { query: adminQuery() });
+        const rtRes = await api('GET', `/admin/room-types/${roomTypeId}`, { query: adminQuery() });
+        renderRoomTypeImagesModal(rtRes.data);
+      } catch (err) { toast(err.message, true); }
+    }
+
+    /* =========================================================
+       PHYSICAL ROOMS (unchanged)
+       ========================================================= */
+    async function viewRooms() {
+      setMain(
+        `<h1 class="pagetitle"><i class="fas fa-bed"></i> Physical Rooms</h1><div class="loading-placeholder"><span class="spinner"></span> Loading…</div>`
+        );
+      try {
+        const [roomsRes, rtRes] = await Promise.all([
+          api('GET', '/admin/rooms', { query: adminQuery() }),
+          api('GET', '/admin/room-types', { query: adminQuery({ pageSize: 100 }) })
+        ]);
+        state.cache.roomTypes = rtRes.data;
+        const rtMap = Object.fromEntries(rtRes.data.map(rt => [rt.id, rt.name]));
+        setMain(`
+          <h1 class="pagetitle"><i class="fas fa-bed"></i> Physical Rooms</h1>
+          <div class="toolbar"><button class="btn green" onclick="openRoomForm()"><i class="fas fa-plus"></i> New Room</button></div>
+          <div class="card">
+            <table><thead><tr><th>Room #</th><th>Room Type</th><th>Floor</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              ${roomsRes.data.map(r => `<tr>
+                <td><strong>${esc(r.roomNumber)}</strong><br><span class="muted" style="font-size:0.6rem;">${r.id}</span></td>
+                <td>${esc(rtMap[r.roomTypeId] || '-')}</td>
+                <td>${esc(r.floor || '-')}</td>
+                <td>
+                  <select onchange="changeRoomStatus('${r.id}', this.value)" style="padding:2px 8px; border-radius:30px; border:1px solid #dde5ed; font-size:0.75rem;">
+                    ${['active', 'maintenance', 'out_of_service'].map(s => `<option value="${s}" ${r.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+                  </select>
+                </td>
+                <td><button class="btn small red" onclick="deleteRoom('${r.id}')"><i class="fas fa-trash"></i></button></td>
+              </tr>`).join('')}
+            </tbody></table>
+          </div>
+        `);
+      } catch (err) {
+        setMain(`<h1 class="pagetitle"><i class="fas fa-bed"></i> Physical Rooms</h1><p style="color:#b13e3e;">${esc(err.message)}</p>`);
+      }
+    }
+
+    function openRoomForm() {
+      const rts = state.cache.roomTypes || [];
+      openModal(`
+        <span class="close-x" onclick="closeModal()">&times;</span>
+        <h2><i class="fas fa-plus-circle"></i> New Room</h2>
+        <label>Room Type</label>
+        <select id="room-rt">${rts.map(rt => `<option value="${rt.id}">${esc(rt.name)}</option>`).join('')}</select>
+        <label>Room Number</label><input id="room-number">
+        <label>Floor</label><input id="room-floor">
+        <div class="field-error" id="room-error"></div>
+        <div class="modal-actions">
+          <button class="btn gray" onclick="closeModal()">Cancel</button>
+          <button class="btn green" onclick="submitRoomForm()"><i class="fas fa-save"></i> Save</button>
+        </div>
+      `);
+    }
+
+    async function submitRoomForm() {
+      const body = {
+        roomTypeId: document.getElementById('room-rt').value,
+        roomNumber: document.getElementById('room-number').value,
+        floor: document.getElementById('room-floor').value
+      };
+      try {
+        await api('POST', '/admin/rooms', { query: adminQuery(), body });
+        toast('Room created.');
+        closeModal();
+        viewRooms();
+      } catch (err) { document.getElementById('room-error').textContent = err.message; }
+    }
+
+    async function changeRoomStatus(id, status) {
+      try {
+        await api('PATCH', `/admin/rooms/${id}/status`, { query: adminQuery(), body: { status } });
+        toast('Room status updated.');
+      } catch (err) { toast(err.message, true); }
+    }
+
+    async function deleteRoom(id) {
+      if (!confirm('Delete this room?')) return;
+      try {
+        await api('DELETE', `/admin/rooms/${id}`, { query: adminQuery() });
+        toast('Room deleted.');
+        viewRooms();
+      } catch (err) { toast(err.message, true); }
+    }
+
+    /* =========================================================
+       RATE PLANS (unchanged)
+       ========================================================= */
+    async function viewRatePlans() {
+      setMain(
+        `<h1 class="pagetitle"><i class="fas fa-tags"></i> Rate Plans</h1><div class="loading-placeholder"><span class="spinner"></span> Loading…</div>`
+        );
+      try {
+        const [rpRes, rtRes] = await Promise.all([
+          api('GET', '/admin/rate-plans', { query: adminQuery() }),
+          api('GET', '/admin/room-types', { query: adminQuery({ pageSize: 100 }) })
+        ]);
+        state.cache.roomTypes = rtRes.data;
+        const rtMap = Object.fromEntries(rtRes.data.map(rt => [rt.id, rt.name]));
+        setMain(`
+          <h1 class="pagetitle"><i class="fas fa-tags"></i> Rate Plans</h1>
+          <div class="toolbar"><button class="btn green" onclick="openRatePlanForm()"><i class="fas fa-plus"></i> New Rate Plan</button></div>
+          <div class="card">
+            <table><thead><tr><th>Name</th><th>Room Type</th><th>Price</th><th>Valid</th><th>Active</th><th></th></tr></thead>
+            <tbody>
+              ${rpRes.data.map(rp => `<tr>
+                <td><strong>${esc(rp.name)}</strong></td>
+                <td>${esc(rtMap[rp.roomTypeId] || '-')}</td>
+                <td>${money(rp.priceOverride)}</td>
+                <td>${fmtDate(rp.validFrom)} → ${fmtDate(rp.validTo)}</td>
+                <td>${rp.isActive ? badge('active') : badge('cancelled')}</td>
+                <td>
+                  <button class="btn small" onclick="toggleRatePlan('${rp.id}', ${rp.isActive})">${rp.isActive ? 'Deactivate' : 'Activate'}</button>
+                  <button class="btn small red" onclick="deleteRatePlan('${rp.id}')"><i class="fas fa-trash"></i></button>
+                </td>
+              </tr>`).join('')}
+            </tbody></table>
+          </div>
+        `);
+      } catch (err) {
+        setMain(`<h1 class="pagetitle"><i class="fas fa-tags"></i> Rate Plans</h1><p style="color:#b13e3e;">${esc(err.message)}</p>`);
+      }
+    }
+
+    function openRatePlanForm() {
+      const rts = state.cache.roomTypes || [];
+      openModal(`
+        <span class="close-x" onclick="closeModal()">&times;</span>
+        <h2><i class="fas fa-plus-circle"></i> New Rate Plan</h2>
+        <label>Room Type</label>
+        <select id="rp-rt">${rts.map(rt => `<option value="${rt.id}">${esc(rt.name)}</option>`).join('')}</select>
+        <label>Name</label><input id="rp-name">
+        <label>Price override</label><input id="rp-price" type="number">
+        <label>Valid from</label><input id="rp-from" type="date">
+        <label>Valid to</label><input id="rp-to" type="date">
+        <div class="field-error" id="rp-error"></div>
+        <div class="modal-actions">
+          <button class="btn gray" onclick="closeModal()">Cancel</button>
+          <button class="btn green" onclick="submitRatePlanForm()"><i class="fas fa-save"></i> Save</button>
+        </div>
+      `);
+    }
+
+    async function submitRatePlanForm() {
+      const body = {
+        roomTypeId: document.getElementById('rp-rt').value,
+        name: document.getElementById('rp-name').value,
+        priceOverride: Number(document.getElementById('rp-price').value),
+        validFrom: document.getElementById('rp-from').value,
+        validTo: document.getElementById('rp-to').value
+      };
+      try {
+        await api('POST', '/admin/rate-plans', { query: adminQuery(), body });
+        toast('Rate plan created.');
+        closeModal();
+        viewRatePlans();
+      } catch (err) { document.getElementById('rp-error').textContent = err.message; }
+    }
+
+    async function toggleRatePlan(id, currentlyActive) {
+      try {
+        await api('PATCH', `/admin/rate-plans/${id}`, { query: adminQuery(), body: { isActive: !currentlyActive } });
+        viewRatePlans();
+      } catch (err) { toast(err.message, true); }
+    }
+
+    async function deleteRatePlan(id) {
+      if (!confirm('Delete this rate plan?')) return;
+      try {
+        await api('DELETE', `/admin/rate-plans/${id}`, { query: adminQuery() });
+        viewRatePlans();
+      } catch (err) { toast(err.message, true); }
+    }
+
+    /* =========================================================
+       CANCELLATION POLICIES (unchanged)
+       ========================================================= */
+    async function viewPolicies() {
+      setMain(
+        `<h1 class="pagetitle"><i class="fas fa-file-contract"></i> Cancellation Policies</h1><div class="loading-placeholder"><span class="spinner"></span> Loading…</div>`
+        );
+      try {
+        const res = await api('GET', '/admin/cancellation-policies', { query: adminQuery() });
+        setMain(`
+          <h1 class="pagetitle"><i class="fas fa-file-contract"></i> Cancellation Policies</h1>
+          <div class="toolbar"><button class="btn green" onclick="openPolicyForm()"><i class="fas fa-plus"></i> New Policy</button></div>
+          <div class="card">
+            <table><thead><tr><th>Name</th><th>Deposit %</th><th>Tiers</th><th>Default</th><th></th></tr></thead>
+            <tbody>
+              ${res.data.map(p => `<tr>
+                <td><strong>${esc(p.name)}</strong></td>
+                <td>${p.depositPct}%</td>
+                <td><span class="muted">${esc(JSON.stringify(p.tiers))}</span></td>
+                <td>${p.isDefault ? badge('active') : ''}</td>
+                <td>
+                  ${!p.isDefault ? `<button class="btn small" onclick="setDefaultPolicy('${p.id}')">Set default</button>` : ''}
+                  <button class="btn small red" onclick="deletePolicy('${p.id}')" ${p.isDefault ? 'disabled' : ''}><i class="fas fa-trash"></i></button>
+                </td>
+              </tr>`).join('')}
+            </tbody></table>
+          </div>
+        `);
+      } catch (err) {
+        setMain(`<h1 class="pagetitle"><i class="fas fa-file-contract"></i> Cancellation Policies</h1><p style="color:#b13e3e;">${esc(err.message)}</p>`);
+      }
+    }
+
+    function openPolicyForm() {
+      openModal(`
+        <span class="close-x" onclick="closeModal()">&times;</span>
+        <h2><i class="fas fa-plus-circle"></i> New Policy</h2>
+        <label>Name</label><input id="cp-name">
+        <label>Deposit %</label><input id="cp-deposit" type="number">
+        <label>Tiers (JSON array)</label>
+        <textarea id="cp-tiers">[{"days_before":15,"refund_pct":100},{"days_before":14,"refund_pct":50},{"hours_before":48,"refund_pct":0}]</textarea>
+        <label><input type="checkbox" id="cp-default" style="width:auto; display:inline-block; margin-right:6px;"> Set as default</label>
+        <div class="field-error" id="cp-error"></div>
+        <div class="modal-actions">
+          <button class="btn gray" onclick="closeModal()">Cancel</button>
+          <button class="btn green" onclick="submitPolicyForm()"><i class="fas fa-save"></i> Save</button>
+        </div>
+      `);
+    }
+
+    async function submitPolicyForm() {
+      let tiers;
+      try { tiers = JSON.parse(document.getElementById('cp-tiers').value); } catch (e) { document.getElementById('cp-error')
+          .textContent = 'Tiers must be valid JSON.'; return; }
+      const body = {
+        name: document.getElementById('cp-name').value,
+        depositPct: Number(document.getElementById('cp-deposit').value),
+        tiers,
+        isDefault: document.getElementById('cp-default').checked
+      };
+      try {
+        await api('POST', '/admin/cancellation-policies', { query: adminQuery(), body });
+        toast('Policy created.');
+        closeModal();
+        viewPolicies();
+      } catch (err) { document.getElementById('cp-error').textContent = err.message; }
+    }
+
+    async function setDefaultPolicy(id) {
+      try {
+        await api('PATCH', `/admin/cancellation-policies/${id}/set-default`, { query: adminQuery() });
+        viewPolicies();
+      } catch (err) { toast(err.message, true); }
+    }
+
+    async function deletePolicy(id) {
+      if (!confirm('Delete this policy?')) return;
+      try {
+        await api('DELETE', `/admin/cancellation-policies/${id}`, { query: adminQuery() });
+        viewPolicies();
+      } catch (err) { toast(err.message, true); }
+    }
+
+    /* =========================================================
+       OFFERS (unchanged)
+       ========================================================= */
+    async function viewOffers() {
+      setMain(
+        `<h1 class="pagetitle"><i class="fas fa-gift"></i> Offers</h1><div class="loading-placeholder"><span class="spinner"></span> Loading…</div>`
+        );
+      try {
+        const res = await api('GET', '/admin/offers', { query: adminQuery({ pageSize: 100 }) });
+        setMain(`
+          <h1 class="pagetitle"><i class="fas fa-gift"></i> Offers</h1>
+          <div class="toolbar"><button class="btn green" onclick="openOfferForm()"><i class="fas fa-plus"></i> New Offer</button></div>
+          <div class="card">
+            <table><thead><tr><th>Title</th><th>Discount</th><th>Active</th><th></th></tr></thead>
+            <tbody>
+              ${res.data.map(o => `<tr>
+                <td><strong>${esc(o.title)}</strong><br><span class="muted">${esc(o.description || '')}</span></td>
+                <td>${o.discountType === 'percentage' ? o.discountValue + '%' : money(o.discountValue)}</td>
+                <td>${o.isActive ? badge('active') : badge('cancelled')}</td>
+                <td>
+                  <button class="btn small" onclick="toggleOffer('${o.id}', ${o.isActive})">${o.isActive ? 'Deactivate' : 'Activate'}</button>
+                  <button class="btn small red" onclick="deleteOffer('${o.id}')"><i class="fas fa-trash"></i></button>
+                </td>
+              </tr>`).join('')}
+            </tbody></table>
+          </div>
+        `);
+      } catch (err) {
+        setMain(`<h1 class="pagetitle"><i class="fas fa-gift"></i> Offers</h1><p style="color:#b13e3e;">${esc(err.message)}</p>`);
+      }
+    }
+
+    function openOfferForm() {
+      openModal(`
+        <span class="close-x" onclick="closeModal()">&times;</span>
+        <h2><i class="fas fa-plus-circle"></i> New Offer</h2>
+        <label>Title</label><input id="of-title">
+        <label>Description</label><textarea id="of-desc"></textarea>
+        <label>Discount type</label>
+        <select id="of-type"><option value="percentage">Percentage</option><option value="fixed_amount">Fixed amount</option></select>
+        <label>Discount value</label><input id="of-value" type="number">
+        <div class="field-error" id="of-error"></div>
+        <div class="modal-actions">
+          <button class="btn gray" onclick="closeModal()">Cancel</button>
+          <button class="btn green" onclick="submitOfferForm()"><i class="fas fa-save"></i> Save</button>
+        </div>
+      `);
+    }
+
+    async function submitOfferForm() {
+      const body = {
+        title: document.getElementById('of-title').value,
+        description: document.getElementById('of-desc').value,
+        discountType: document.getElementById('of-type').value,
+        discountValue: Number(document.getElementById('of-value').value)
+      };
+      try {
+        await api('POST', '/admin/offers', { query: adminQuery(), body });
+        toast('Offer created.');
+        closeModal();
+        viewOffers();
+      } catch (err) { document.getElementById('of-error').textContent = err.message; }
+    }
+
+    async function toggleOffer(id, currentlyActive) {
+      try {
+        await api('PATCH', `/admin/offers/${id}`, { query: adminQuery(), body: { isActive: !currentlyActive } });
+        viewOffers();
+      } catch (err) { toast(err.message, true); }
+    }
+
+    async function deleteOffer(id) {
+      if (!confirm('Delete this offer?')) return;
+      try {
+        await api('DELETE', `/admin/offers/${id}`, { query: adminQuery() });
+        viewOffers();
+      } catch (err) { toast(err.message, true); }
+    }
+
+    /* =========================================================
+       EVENT TYPES (unchanged)
+       ========================================================= */
+    async function viewEventTypes() {
+      setMain(
+        `<h1 class="pagetitle"><i class="fas fa-calendar-plus"></i> Event Types</h1><div class="loading-placeholder"><span class="spinner"></span> Loading…</div>`
+        );
+      try {
+        const res = await api('GET', '/admin/event-types', { query: adminQuery() });
+        state.cache.eventTypes = res.data;
+        setMain(`
+          <h1 class="pagetitle"><i class="fas fa-calendar-plus"></i> Event Types</h1>
+          <div class="toolbar"><button class="btn green" onclick="openEventTypeForm()"><i class="fas fa-plus"></i> New Event Type</button></div>
+          <div class="card">
+            <table><thead><tr><th>Order</th><th>Title</th><th>Active</th><th></th></tr></thead>
+            <tbody>
+              ${res.data.map((et, idx) => `<tr>
+                <td>
+                  <button class="btn small gray" onclick="moveEventType(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}><i class="fas fa-chevron-up"></i></button>
+                  <button class="btn small gray" onclick="moveEventType(${idx}, 1)" ${idx === res.data.length - 1 ? 'disabled' : ''}><i class="fas fa-chevron-down"></i></button>
+                </td>
+                <td><strong>${esc(et.title)}</strong><br><span class="muted">${esc(et.description || '')}</span></td>
+                <td>${et.isActive ? badge('active') : badge('cancelled')}</td>
+                <td><button class="btn small red" onclick="deactivateEventType('${et.id}')"><i class="fas fa-ban"></i></button></td>
+              </tr>`).join('')}
+            </tbody></table>
+          </div>
+        `);
+      } catch (err) {
+        setMain(`<h1 class="pagetitle"><i class="fas fa-calendar-plus"></i> Event Types</h1><p style="color:#b13e3e;">${esc(err.message)}</p>`);
+      }
+    }
+
+    function openEventTypeForm() {
+      openModal(`
+        <span class="close-x" onclick="closeModal()">&times;</span>
+        <h2><i class="fas fa-plus-circle"></i> New Event Type</h2>
+        <label>Title</label><input id="et-title">
+        <label>Description</label><textarea id="et-desc"></textarea>
+        <label>Icon (optional keyword)</label><input id="et-icon">
+        <div class="field-error" id="et-error"></div>
+        <div class="modal-actions">
+          <button class="btn gray" onclick="closeModal()">Cancel</button>
+          <button class="btn green" onclick="submitEventTypeForm()"><i class="fas fa-save"></i> Save</button>
+        </div>
+      `);
+    }
+
+    async function submitEventTypeForm() {
+      const body = {
+        title: document.getElementById('et-title').value,
+        description: document.getElementById('et-desc').value,
+        icon: document.getElementById('et-icon').value,
+        sortOrder: (state.cache.eventTypes || []).length
+      };
+      try {
+        await api('POST', '/admin/event-types', { query: adminQuery(), body });
+        toast('Event type created.');
+        closeModal();
+        viewEventTypes();
+      } catch (err) { document.getElementById('et-error').textContent = err.message; }
+    }
+
+    async function deactivateEventType(id) {
+      if (!confirm('Deactivate this event type?')) return;
+      try {
+        await api('DELETE', `/admin/event-types/${id}`, { query: adminQuery() });
+        viewEventTypes();
+      } catch (err) { toast(err.message, true); }
+    }
+
+    async function moveEventType(idx, delta) {
+      const list = state.cache.eventTypes;
+      const otherIdx = idx + delta;
+      if (otherIdx < 0 || otherIdx >= list.length) return;
+      const a = list[idx],
+        b = list[otherIdx];
+      try {
+        await api('PATCH', '/admin/event-types/reorder', {
+          query: adminQuery(),
+          body: { items: [{ id: a.id, sortOrder: otherIdx }, { id: b.id, sortOrder: idx }] }
+        });
+        viewEventTypes();
+      } catch (err) { toast(err.message, true); }
+    }
+
+    /* =========================================================
+       GALLERY (unchanged)
+       ========================================================= */
+    let galleryFilter = '';
+
+    async function viewGallery() {
+      setMain(
+        `<h1 class="pagetitle"><i class="fas fa-images"></i> Gallery</h1><div class="loading-placeholder"><span class="spinner"></span> Loading…</div>`
+        );
+      await loadGallery();
+    }
+
+    async function loadGallery() {
+      try {
+        const res = await api('GET', '/admin/gallery', { query: adminQuery({ category: galleryFilter }) });
+        state.cache.gallery = res.data;
+        setMain(`
+          <h1 class="pagetitle"><i class="fas fa-images"></i> Gallery</h1>
+          <div class="toolbar">
+            <select id="galCategory" onchange="applyGalleryFilter(this.value)">
+              <option value="">All categories</option>
+              ${['rooms', 'dining', 'events', 'exterior'].map(c => `<option value="${c}" ${galleryFilter === c ? 'selected' : ''}>${c}</option>`).join('')}
+            </select>
+            <button class="btn green" onclick="openGalleryUploadForm()"><i class="fas fa-upload"></i> Upload</button>
+          </div>
+          <div class="gallery-grid">
+            ${res.data.map((g, idx) => `
+              <div class="gallery-card">
+                <img src="${esc(g.imageUrl)}" onerror="this.style.opacity=0.3">
+                <div class="body">
+                  <span class="badge b-active" style="background:#6f8aa3;">${esc(g.category)}</span>
+                  <div>${esc(g.caption || '')}</div>
+                  <div style="margin-top:4px;">
+                    <button class="btn small gray" onclick="moveGalleryItem(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}><i class="fas fa-chevron-up"></i></button>
+                    <button class="btn small gray" onclick="moveGalleryItem(${idx}, 1)" ${idx === res.data.length - 1 ? 'disabled' : ''}><i class="fas fa-chevron-down"></i></button>
+                    <button class="btn small red" onclick="deleteGalleryItem('${g.id}')"><i class="fas fa-trash"></i></button>
+                  </div>
+                </div>
+              </div>
+            `).join('') || '<p class="muted">No gallery items yet.</p>'}
+          </div>
+        `);
+      } catch (err) {
+        setMain(`<h1 class="pagetitle"><i class="fas fa-images"></i> Gallery</h1><p style="color:#b13e3e;">${esc(err.message)}</p>`);
+      }
+    }
+
+    function applyGalleryFilter(val) { galleryFilter = val;
+      loadGallery(); }
+
+    function openGalleryUploadForm() {
+      openModal(`
+        <span class="close-x" onclick="closeModal()">&times;</span>
+        <h2><i class="fas fa-upload"></i> Upload Gallery Image</h2>
+        <label>File</label>
+        <input type="file" id="gal-file" accept="image/jpeg,image/png,image.webp">
+        <label>Category</label>
+        <select id="gal-category">${['rooms', 'dining', 'events', 'exterior'].map(c => `<option value="${c}">${c}</option>`).join('')}</select>
+        <label>Caption</label><input id="gal-caption">
+        <div class="field-error" id="gal-error"></div>
+        <div class="modal-actions">
+          <button class="btn gray" onclick="closeModal()">Cancel</button>
+          <button class="btn green" id="galUploadBtn" onclick="submitGalleryUpload()"><i class="fas fa-save"></i> Upload</button>
+        </div>
+      `);
+    }
+
+    async function submitGalleryUpload() {
+      const fileInput = document.getElementById('gal-file');
+      const errorEl = document.getElementById('gal-error');
+      const btn = document.getElementById('galUploadBtn');
+
+      if (!fileInput.files.length) {
+        errorEl.textContent = 'Choose a file.';
+        return;
+      }
+
+      btn.innerHTML = '<span class="spinner spinner-white" style="width:0.9rem;height:0.9rem;border-width:2px;"></span> Uploading…';
+      btn.disabled = true;
+      errorEl.textContent = '';
+
+      try {
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+        const uploadRes = await api('POST', '/admin/media/upload', { query: adminQuery(), body: formData, isForm: true });
+        await api('POST', '/admin/gallery', {
+          query: adminQuery(),
+          body: { category: document.getElementById('gal-category').value, imageUrl: uploadRes.data.url, caption: document
+              .getElementById('gal-caption').value }
+        });
+        toast('Gallery item added.');
+        closeModal();
+        loadGallery();
+      } catch (err) {
+        errorEl.textContent = err.message;
+        btn.innerHTML = '<i class="fas fa-save"></i> Upload';
+        btn.disabled = false;
+      }
+    }
+
+    async function deleteGalleryItem(id) {
+      if (!confirm('Delete this gallery item?')) return;
+      try {
+        await api('DELETE', `/admin/gallery/${id}`, { query: adminQuery() });
+        loadGallery();
+      } catch (err) { toast(err.message, true); }
+    }
+
+    async function moveGalleryItem(idx, delta) {
+      const list = state.cache.gallery;
+      const otherIdx = idx + delta;
+      if (otherIdx < 0 || otherIdx >= list.length) return;
+      const a = list[idx],
+        b = list[otherIdx];
+      try {
+        await api('PATCH', '/admin/gallery/reorder', {
+          query: adminQuery(),
+          body: { items: [{ id: a.id, sortOrder: otherIdx }, { id: b.id, sortOrder: idx }] }
+        });
+        loadGallery();
+      } catch (err) { toast(err.message, true); }
+    }
+
+    /* =========================================================
+       INQUIRIES (unchanged)
+       ========================================================= */
+    async function viewInquiries() {
+      setMain(
+        `<h1 class="pagetitle"><i class="fas fa-message"></i> Inquiries</h1><div class="loading-placeholder"><span class="spinner"></span> Loading…</div>`
+        );
+      try {
+        const res = await api('GET', '/admin/inquiries', { query: adminQuery({ pageSize: 50 }) });
+        setMain(`
+          <h1 class="pagetitle"><i class="fas fa-message"></i> Inquiries</h1>
+          <div class="card">
+            <table><thead><tr><th>Type</th><th>Name</th><th>Message</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              ${res.data.map(i => `<tr>
+                <td><span class="badge b-active" style="background:#6f8aa3;">${esc(i.type)}</span></td>
+                <td><strong>${esc(i.name)}</strong><br><span class="muted">${esc(i.email)}</span></td>
+                <td style="max-width:260px;">${esc(i.message)}</td>
+                <td>${badge(i.status)}</td>
+                <td>
+                  <select onchange="updateInquiryStatus('${i.id}', this.value)" style="padding:2px 8px; border-radius:30px; border:1px solid #dde5ed;">
+                    ${['new', 'contacted', 'closed'].map(s => `<option value="${s}" ${i.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+                  </select>
+                </td>
+              </tr>`).join('')}
+            </tbody></table>
+          </div>
+        `);
+      } catch (err) {
+        setMain(`<h1 class="pagetitle"><i class="fas fa-message"></i> Inquiries</h1><p style="color:#b13e3e;">${esc(err.message)}</p>`);
+      }
+    }
+
+    async function updateInquiryStatus(id, status) {
+      try {
+        await api('PATCH', `/admin/inquiries/${id}/status`, { query: adminQuery(), body: { status } });
+        toast('Inquiry updated.');
+      } catch (err) { toast(err.message, true); }
+    }
+
+    /* =========================================================
+       STAFF (unchanged)
+       ========================================================= */
+    async function viewStaff() {
+      setMain(
+        `<h1 class="pagetitle"><i class="fas fa-users-gear"></i> Staff Accounts</h1><div class="loading-placeholder"><span class="spinner"></span> Loading…</div>`
+        );
+      try {
+        const res = await api('GET', '/admin/staff', { query: {} });
+        setMain(`
+          <h1 class="pagetitle"><i class="fas fa-users-gear"></i> Staff Accounts</h1>
+          <div class="toolbar"><button class="btn green" onclick="openStaffForm()"><i class="fas fa-plus"></i> New Staff/Admin</button></div>
+          <div class="card">
+            <table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Property</th><th>Active</th><th></th></tr></thead>
+            <tbody>
+              ${res.data.map(u => `<tr>
+                <td><strong>${esc(u.firstName)} ${esc(u.lastName)}</strong></td>
+                <td>${esc(u.email)}</td>
+                <td>${esc(u.role)}</td>
+                <td>${esc((PROPERTIES.find(p => p.id === u.propertyId) || {}).name || '-')}</td>
+                <td>${u.isActive ? badge('active') : badge('cancelled')}</td>
+                <td><button class="btn small red" onclick="deactivateStaff('${u.id}')"><i class="fas fa-user-slash"></i></button></td>
+              </tr>`).join('')}
+            </tbody></table>
+          </div>
+        `);
+      } catch (err) {
+        setMain(`<h1 class="pagetitle"><i class="fas fa-users-gear"></i> Staff Accounts</h1><p style="color:#b13e3e;">${esc(err.message)}</p>`);
+      }
+    }
+
+    function openStaffForm() {
+      openModal(`
+        <span class="close-x" onclick="closeModal()">&times;</span>
+        <h2><i class="fas fa-user-plus"></i> New Staff/Admin</h2>
+        <label>Email</label><input id="st-email">
+        <label>First name</label><input id="st-first">
+        <label>Last name</label><input id="st-last">
+        <label>Role</label>
+        <select id="st-role"><option value="staff">staff</option><option value="admin">admin</option></select>
+        <label>Property</label>
+        <select id="st-property">${PROPERTIES.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select>
+        <div class="field-error" id="st-error"></div>
+        <div class="modal-actions">
+          <button class="btn gray" onclick="closeModal()">Cancel</button>
+          <button class="btn green" onclick="submitStaffForm()"><i class="fas fa-save"></i> Create</button>
+        </div>
+      `);
+    }
+
+    async function submitStaffForm() {
+      const body = {
+        email: document.getElementById('st-email').value,
+        firstName: document.getElementById('st-first').value,
+        lastName: document.getElementById('st-last').value,
+        role: document.getElementById('st-role').value,
+        propertyId: document.getElementById('st-property').value
+      };
+      try {
+        const res = await api('POST', '/admin/staff', { body });
+        openModal(`
+          <h2><i class="fas fa-check-circle" style="color:#1f8b4c;"></i> Account created</h2>
+          <p>Temporary password (shown once):</p>
+          <div class="card" style="font-family:'Courier New',monospace; font-size:1.1rem; background:#f2f6fa;">${esc(res.data.tempPassword)}</div>
+          <div class="modal-actions"><button class="btn" onclick="closeModal(); viewStaff();">Done</button></div>
+        `);
+      } catch (err) { document.getElementById('st-error').textContent = err.message; }
+    }
+
+    async function deactivateStaff(id) {
+      if (!confirm('Deactivate this account?')) return;
+      try {
+        await api('DELETE', `/admin/staff/${id}`, {});
+        toast('Deactivated.');
+        viewStaff();
+      } catch (err) { toast(err.message, true); }
+    }
+
+    /* =========================================================
+       REPORTS (unchanged)
+       ========================================================= */
+    async function viewReports() {
+      const today = new Date();
+      const from = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().slice(0, 10);
+      const to = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().slice(0, 10);
+      setMain(`
+        <h1 class="pagetitle"><i class="fas fa-chart-simple"></i> Reports</h1>
+        <div class="toolbar">
+          <input type="date" id="rep-from" value="${from}">
+          <input type="date" id="rep-to" value="${to}">
+          <button class="btn" onclick="loadReports()"><i class="fas fa-play"></i> Run</button>
+        </div>
+        <div id="reportResults"><div class="loading-placeholder"><span class="spinner"></span> Load reports…</div></div>
+      `);
+      loadReports();
+    }
+
+    async function loadReports() {
+      const from = document.getElementById('rep-from').value;
+      const to = document.getElementById('rep-to').value;
+      document.getElementById('reportResults').innerHTML =
+        `<div class="loading-placeholder"><span class="spinner"></span> Fetching data…</div>`;
+      try {
+        const [occ, rev] = await Promise.all([
+          api('GET', '/admin/reports/occupancy', { query: adminQuery({ from, to }) }),
+          api('GET', '/admin/reports/revenue', { query: adminQuery({ from, to }) })
+        ]);
+        document.getElementById('reportResults').innerHTML = `
+          <div class="card">
+            <div class="section-sub" style="margin-top:0;"><i class="fas fa-bed"></i> Occupancy</div>
+            <table><thead><tr><th>Room Type</th><th>Booked Nights</th><th>Available Nights</th><th>Occupancy %</th></tr></thead>
+            <tbody>${occ.data.map(r => `<tr><td>${esc(r.roomTypeName)}</td><td>${r.bookedRoomNights}</td><td>${r.availableRoomNights}</td><td>${r.occupancyPct}%</td></tr>`).join('')}</tbody>
+          </table></div>
+          <div class="card">
+            <div class="section-sub" style="margin-top:0;"><i class="fas fa-coins"></i> Revenue</div>
+            <table><thead><tr><th>Room Type</th><th>Booked</th><th>Collected</th><th>Outstanding</th></tr></thead>
+            <tbody>${rev.data.map(r => `<tr><td>${esc(r.roomTypeName)}</td><td>${money(r.bookedRevenue)}</td><td>${money(r.collectedRevenue)}</td><td>${money(r.outstandingRevenue)}</td></tr>`).join('')}</tbody>
+          </table></div>
+        `;
+      } catch (err) {
+        document.getElementById('reportResults').innerHTML = `<p style="color:#b13e3e;"><i class="fas fa-triangle-exclamation"></i> ${esc(err.message)}</p>`;
+      }
+    }
+
+    /* =========================================================
+       SETTINGS (unchanged, but restyled via CSS)
+       ========================================================= */
+    async function viewSettings() {
+      setMain(
+        `<h1 class="pagetitle"><i class="fas fa-sliders"></i> Property Settings</h1><div class="loading-placeholder"><span class="spinner"></span> Loading…</div>`
+        );
+      try {
+        const res = await api('GET', '/admin/property', { query: adminQuery() });
+        const p = res.data;
+        setMain(`
+          <h1 class="pagetitle"><i class="fas fa-sliders"></i> ${esc(p.name)}</h1>
+          <div class="card" style="max-width:500px;">
+            <label>Contact email</label><input id="ps-email" value="${esc(p.contactEmail || '')}">
+            <label>Contact phone</label><input id="ps-phone" value="${esc(p.contactPhone || '')}">
+            <label>Address</label><input id="ps-address" value="${esc(p.address || '')}">
+            <label>Check-in time (HH:mm)</label><input id="ps-checkin" value="${esc((p.checkInTime || '').slice(0, 5))}">
+            <label>Check-out time (HH:mm)</label><input id="ps-checkout" value="${esc((p.checkOutTime || '').slice(0, 5))}">
+            <div class="field-error" id="ps-error"></div>
+            <div style="margin-top:20px;">
+              <button class="btn green" onclick="submitSettingsForm()"><i class="fas fa-save"></i> Save</button>
+            </div>
+          </div>
+        `);
+      } catch (err) {
+        setMain(`<h1 class="pagetitle"><i class="fas fa-sliders"></i> Property Settings</h1><p style="color:#b13e3e;">${esc(err.message)}</p>`);
+      }
+    }
+
+    async function submitSettingsForm() {
+      const body = {
+        contactEmail: document.getElementById('ps-email').value,
+        contactPhone: document.getElementById('ps-phone').value,
+        address: document.getElementById('ps-address').value,
+        checkInTime: document.getElementById('ps-checkin').value,
+        checkOutTime: document.getElementById('ps-checkout').value
+      };
+      try {
+        await api('PATCH', '/admin/property', { query: adminQuery(), body });
+        toast('Settings saved.');
+      } catch (err) { document.getElementById('ps-error').textContent = err.message; }
+    }
+
+    // close modal on overlay click
+    document.getElementById('modalOverlay').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+  </script>
+</body>
+</html>

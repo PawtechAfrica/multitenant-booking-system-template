@@ -4,6 +4,8 @@ const AppError = require('../utils/AppError')
 const { canTransition } = require('../utils/bookingStatus')
 const { parsePagination } = require('../utils/pagination')
 const { serializeBooking, createBooking: createGuestBooking } = require('./booking.service')
+const notificationService = require('./notification.service')
+
 
 const listBookings = async (propertyId, query) => {
   const { page, pageSize, offset, limit } = parsePagination(query)
@@ -52,21 +54,37 @@ const getBooking = async (propertyId, bookingId) => {
   return serializeBooking(await findOwnedBooking(propertyId, bookingId))
 }
 
+// const updateBookingStatus = async (propertyId, bookingId, newStatus) => {
+//   const booking = await findOwnedBooking(propertyId, bookingId)
+
+//   if (!canTransition(booking.status, newStatus)) {
+//     throw new AppError(
+//       `Cannot move a booking from "${booking.status}" to "${newStatus}".`,
+//       409,
+//       'VALIDATION_ERROR'
+//     )
+//   }
+
+//   booking.status = newStatus
+//   await booking.save()
+//   return serializeBooking(booking)
+// }
+
 const updateBookingStatus = async (propertyId, bookingId, newStatus) => {
   const booking = await findOwnedBooking(propertyId, bookingId)
 
   if (!canTransition(booking.status, newStatus)) {
-    throw new AppError(
-      `Cannot move a booking from "${booking.status}" to "${newStatus}".`,
-      409,
-      'VALIDATION_ERROR'
-    )
+    throw new AppError(`Cannot move a booking from "${booking.status}" to "${newStatus}".`, 409, 'VALIDATION_ERROR')
   }
 
   booking.status = newStatus
   await booking.save()
+
+  await notificationService.sendBookingStatusEmail(booking.id, newStatus)
   return serializeBooking(booking)
 }
+
+
 
 const assignRoom = async (propertyId, bookingId, roomId) => {
   const booking = await findOwnedBooking(propertyId, bookingId)

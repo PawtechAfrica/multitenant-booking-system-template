@@ -7,13 +7,19 @@ const {
   CancellationPolicy
 } = require('../database/models')
 const AppError = require('../utils/AppError')
+const notificationService = require('./notification.service')
+
 const { generateBookingCode } = require('../utils/bookingCode')
 const { computeCancellationDeadline } = require('../utils/cancellationPolicy')
-const { getOverlapCount, findActiveRatePlan, resolvePrice } = require('./availability.service')
+const {
+  getOverlapCount,
+  findActiveRatePlan,
+  resolvePrice
+} = require('./availability.service')
 
 const HOLD_MINUTES = parseInt(process.env.BOOKING_HOLD_MINUTES || '30', 10)
 
-const serializeBooking = (booking) => ({
+const serializeBooking = booking => ({
   id: booking.id,
   bookingCode: booking.booking_code,
   propertyId: booking.property_id,
@@ -38,19 +44,30 @@ const serializeBooking = (booking) => ({
   expiresAt: booking.expires_at
 })
 
-const getCancellationPolicy = async (propertyId, roomTypeId, checkIn, checkOut) => {
+const getCancellationPolicy = async (
+  propertyId,
+  roomTypeId,
+  checkIn,
+  checkOut
+) => {
   const ratePlan = await findActiveRatePlan(roomTypeId, checkIn, checkOut)
 
   if (ratePlan && ratePlan.cancellation_policy_id) {
-    const policy = await CancellationPolicy.findByPk(ratePlan.cancellation_policy_id)
+    const policy = await CancellationPolicy.findByPk(
+      ratePlan.cancellation_policy_id
+    )
     if (policy) return policy
   }
 
-  return CancellationPolicy.findOne({ where: { property_id: propertyId, is_default: true } })
+  return CancellationPolicy.findOne({
+    where: { property_id: propertyId, is_default: true }
+  })
 }
 
-const createBooking = async (payload) => {
-  const property = await Property.findOne({ where: { slug: payload.propertySlug, is_active: true } })
+const createBooking = async payload => {
+  const property = await Property.findOne({
+    where: { slug: payload.propertySlug, is_active: true }
+  })
   if (!property) {
     throw new AppError('Property not found.', 404, 'PROPERTY_NOT_FOUND')
   }
@@ -69,17 +86,31 @@ const createBooking = async (payload) => {
   const availableUnits = roomType.total_units - overlappingCount
 
   if (availableUnits < payload.numRooms) {
-    throw new AppError('No rooms of this type available for the selected dates.', 409, 'BOOKING_NOT_AVAILABLE')
+    throw new AppError(
+      'No rooms of this type available for the selected dates.',
+      409,
+      'BOOKING_NOT_AVAILABLE'
+    )
   }
 
-  const nights = Math.round((new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24))
+  const nights = Math.round(
+    (new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)
+  )
   const pricePerNight = await resolvePrice(roomType, checkIn, checkOut)
   const subtotal = pricePerNight * nights * payload.numRooms
 
-  const policy = await getCancellationPolicy(property.id, roomType.id, checkIn, checkOut)
-  const depositPct = policy && policy.deposit_pct != null ? Number(policy.deposit_pct) : 0
+  const policy = await getCancellationPolicy(
+    property.id,
+    roomType.id,
+    checkIn,
+    checkOut
+  )
+  const depositPct =
+    policy && policy.deposit_pct != null ? Number(policy.deposit_pct) : 0
   const depositRequired = Math.round(subtotal * (depositPct / 100) * 100) / 100
-  const cancellationDeadlineAt = policy ? computeCancellationDeadline(policy.tiers, checkIn) : null
+  const cancellationDeadlineAt = policy
+    ? computeCancellationDeadline(policy.tiers, checkIn)
+    : null
 
   const expiresAt = new Date()
   expiresAt.setMinutes(expiresAt.getMinutes() + HOLD_MINUTES)
@@ -131,7 +162,9 @@ const createBooking = async (payload) => {
 }
 
 const findBookingByCodeForGuest = async (bookingCode, email) => {
-  const booking = await Booking.findOne({ where: { booking_code: bookingCode } })
+  const booking = await Booking.findOne({
+    where: { booking_code: bookingCode }
+  })
 
   if (!booking || booking.guest_email.toLowerCase() !== email.toLowerCase()) {
     throw new AppError('Booking not found.', 404, 'BOOKING_NOT_FOUND')
@@ -148,18 +181,37 @@ const getBookingForGuest = async (bookingCode, email) => {
 const cancelBookingForGuest = async (bookingCode, email) => {
   const booking = await findBookingByCodeForGuest(bookingCode, email)
 
-  if (['cancelled', 'checked_out', 'no_show', 'expired'].includes(booking.status)) {
-    throw new AppError('This booking can no longer be cancelled.', 409, 'CANCELLATION_WINDOW_CLOSED')
+  if (
+    ['cancelled', 'checked_out', 'no_show', 'expired'].includes(booking.status)
+  ) {
+    throw new AppError(
+      'This booking can no longer be cancelled.',
+      409,
+      'CANCELLATION_WINDOW_CLOSED'
+    )
   }
 
-  if (booking.cancellation_deadline_at && new Date() > new Date(booking.cancellation_deadline_at)) {
-    throw new AppError('The free-cancellation window for this booking has passed.', 409, 'CANCELLATION_WINDOW_CLOSED')
+  if (
+    booking.cancellation_deadline_at &&
+    new Date() > new Date(booking.cancellation_deadline_at)
+  ) {
+    throw new AppError(
+      'The free-cancellation window for this booking has passed.',
+      409,
+      'CANCELLATION_WINDOW_CLOSED'
+    )
   }
 
   booking.status = 'cancelled'
   await booking.save()
 
+  await notificationService.sendBookingStatusEmail(booking.id, 'cancelled')
   return serializeBooking(booking)
 }
 
-module.exports = { createBooking, getBookingForGuest, cancelBookingForGuest , serializeBooking}
+module.exports = {
+  createBooking,
+  getBookingForGuest,
+  cancelBookingForGuest,
+  serializeBooking
+}
