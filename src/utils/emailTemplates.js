@@ -1,5 +1,9 @@
-const fmtDate = (d) =>
-  new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+const fmtDate = d =>
+  new Date(d).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
 
 // ---- shared design tokens ----------------------------------------------
 const COLORS = {
@@ -10,18 +14,25 @@ const COLORS = {
   muted: '#6b7280',
   heading: '#0f172a',
   accent: '#111827', // near-black accent, used for the top bar / labels
-  footer: '#9ca3af',
+  footer: '#9ca3af'
 }
 
-const FONT = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+const FONT =
+  "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 
 // Renders a single row inside the details table
 const detailRow = (label, value, isLast = false) => `
   <tr>
-    <td style="padding:10px 0; border-bottom:${isLast ? 'none' : `1px solid ${COLORS.border}`}; font-size:13px; color:${COLORS.muted}; width:44%;">
+    <td style="padding:10px 0; border-bottom:${
+      isLast ? 'none' : `1px solid ${COLORS.border}`
+    }; font-size:13px; color:${COLORS.muted}; width:44%;">
       ${label}
     </td>
-    <td style="padding:10px 0; border-bottom:${isLast ? 'none' : `1px solid ${COLORS.border}`}; font-size:14px; color:${COLORS.text}; text-align:right; font-weight:600;">
+    <td style="padding:10px 0; border-bottom:${
+      isLast ? 'none' : `1px solid ${COLORS.border}`
+    }; font-size:14px; color:${
+  COLORS.text
+}; text-align:right; font-weight:600;">
       ${value}
     </td>
   </tr>
@@ -33,7 +44,7 @@ const STATUS = {
   cancelled: { label: 'Cancelled', color: '#dc2626' },
   expired: { label: 'Hold Expired', color: '#d97706' },
   checkedIn: { label: 'Checked In', color: '#2563eb' },
-  checkedOut: { label: 'Checked Out', color: '#4b5563' },
+  checkedOut: { label: 'Checked Out', color: '#4b5563' }
 }
 
 // Base wrapper: full HTML email shell built with tables for client compatibility
@@ -42,15 +53,25 @@ const wrap = ({ propertyName, statusKey, title, bodyHtml, bookingCode }) => {
   return `
 <!DOCTYPE html>
 <html>
-  <body style="margin:0; padding:0; background-color:${COLORS.bg}; font-family:${FONT};">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${COLORS.bg}; padding:32px 16px;">
+  <body style="margin:0; padding:0; background-color:${
+    COLORS.bg
+  }; font-family:${FONT};">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${
+      COLORS.bg
+    }; padding:32px 16px;">
       <tr>
         <td align="center">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px; background-color:${COLORS.card}; border-radius:12px; overflow:hidden; border:1px solid ${COLORS.border};">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px; background-color:${
+            COLORS.card
+          }; border-radius:12px; overflow:hidden; border:1px solid ${
+    COLORS.border
+  };">
 
             <!-- accent bar -->
             <tr>
-              <td style="height:4px; background-color:${status.color}; font-size:0; line-height:0;">&nbsp;</td>
+              <td style="height:4px; background-color:${
+                status.color
+              }; font-size:0; line-height:0;">&nbsp;</td>
             </tr>
 
             <!-- header -->
@@ -58,20 +79,32 @@ const wrap = ({ propertyName, statusKey, title, bodyHtml, bookingCode }) => {
               <td style="padding:28px 32px 0 32px;">
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                   <tr>
-                    <td style="font-size:13px; letter-spacing:0.04em; text-transform:uppercase; color:${COLORS.muted};">
+                    <td style="font-size:13px; letter-spacing:0.04em; text-transform:uppercase; color:${
+                      COLORS.muted
+                    };">
                       ${propertyName}
                     </td>
                     <td align="right">
-                      <span style="display:inline-block; padding:4px 10px; border-radius:20px; background-color:${status.color}1a; color:${status.color}; font-size:11px; font-weight:700; letter-spacing:0.03em; text-transform:uppercase;">
+                      <span style="display:inline-block; padding:4px 10px; border-radius:20px; background-color:${
+                        status.color
+                      }1a; color:${
+    status.color
+  }; font-size:11px; font-weight:700; letter-spacing:0.03em; text-transform:uppercase;">
                         ${status.label}
                       </span>
                     </td>
                   </tr>
                 </table>
-                <h1 style="margin:16px 0 4px 0; font-size:20px; color:${COLORS.heading}; font-weight:700;">
+                <h1 style="margin:16px 0 4px 0; font-size:20px; color:${
+                  COLORS.heading
+                }; font-weight:700;">
                   ${title}
                 </h1>
-                ${bookingCode ? `<p style="margin:0 0 8px 0; font-size:13px; color:${COLORS.muted};">Booking ${bookingCode}</p>` : ''}
+                ${
+                  bookingCode
+                    ? `<p style="margin:0 0 8px 0; font-size:13px; color:${COLORS.muted};">Booking ${bookingCode}</p>`
+                    : ''
+                }
               </td>
             </tr>
 
@@ -84,7 +117,9 @@ const wrap = ({ propertyName, statusKey, title, bodyHtml, bookingCode }) => {
 
             <!-- footer -->
             <tr>
-              <td style="padding:20px 32px; border-top:1px solid ${COLORS.border}; text-align:center;">
+              <td style="padding:20px 32px; border-top:1px solid ${
+                COLORS.border
+              }; text-align:center;">
                 <p style="margin:0; font-size:12px; color:${COLORS.footer};">
                   This is an automated message about your booking at ${propertyName}.
                 </p>
@@ -116,14 +151,21 @@ const bookingConfirmed = (booking, property) => ({
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
         ${detailRow('Check-in', fmtDate(booking.check_in_date))}
         ${detailRow('Check-out', fmtDate(booking.check_out_date))}
-        ${detailRow('Amount paid', `${booking.amount_paid} ${booking.currency || 'KES'}`)}
-        ${detailRow('Balance due on arrival', `${booking.balance_due} ${booking.currency || 'KES'}`, true)}
+        ${detailRow(
+          'Amount paid',
+          `${booking.amount_paid} ${booking.currency || 'KES'}`
+        )}
+        ${detailRow(
+          'Balance due on arrival',
+          `${booking.balance_due} ${booking.currency || 'KES'}`,
+          true
+        )}
       </table>
       <p style="margin:20px 0 0 0; font-size:14px; color:${COLORS.text};">
         We look forward to welcoming you.
       </p>
-    `,
-  }),
+    `
+  })
 })
 
 const bookingCancelled = (booking, property) => ({
@@ -141,8 +183,8 @@ const bookingCancelled = (booking, property) => ({
       <p style="margin:20px 0 0 0; font-size:14px; color:${COLORS.text};">
         If you believe this is a mistake, please contact us directly.
       </p>
-    `,
-  }),
+    `
+  })
 })
 
 const bookingExpired = (booking, property) => ({
@@ -157,8 +199,8 @@ const bookingExpired = (booking, property) => ({
         Your booking hold expired before payment was completed, so the room has been released.
         You're welcome to make a new booking any time.
       </p>
-    `,
-  }),
+    `
+  })
 })
 
 const bookingCheckedIn = (booking, property) => ({
@@ -172,8 +214,8 @@ const bookingCheckedIn = (booking, property) => ({
       <p style="margin:0; font-size:14px; color:${COLORS.text};">
         You've been checked in. We hope you enjoy your stay!
       </p>
-    `,
-  }),
+    `
+  })
 })
 
 const bookingCheckedOut = (booking, property) => ({
@@ -187,8 +229,26 @@ const bookingCheckedOut = (booking, property) => ({
       <p style="margin:0; font-size:14px; color:${COLORS.text};">
         Thanks for staying with us — you've been checked out. We hope to see you again soon.
       </p>
-    `,
-  }),
+    `
+  })
+})
+
+const staffInvite = (user, property, link) => ({
+  subject: `You're invited to join ${property.name} on the booking admin panel`,
+  html: wrap(
+    property.name,
+    `
+    <p>Hi ${user.first_name},</p>
+    <p>You've been added as ${
+      user.role === 'admin' ? 'an admin' : 'a staff member'
+    } for <b>${property.name}</b>.</p>
+    <p>Click below to set your password and activate your account:</p>
+    <p><a href="${link}" style="background:#2b5e86; color:#fff; padding:10px 18px; text-decoration:none; border-radius:5px; display:inline-block;">Set your password</a></p>
+    <p style="font-size:12px; color:#888;">This link expires in ${
+      process.env.INVITE_TOKEN_EXPIRES_HOURS || 48
+    } hours. If the button doesn't work, copy this link: ${link}</p>
+  `
+  )
 })
 
 module.exports = {
@@ -197,4 +257,6 @@ module.exports = {
   bookingExpired,
   bookingCheckedIn,
   bookingCheckedOut,
+  staffInvite
 }
+

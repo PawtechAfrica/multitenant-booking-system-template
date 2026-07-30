@@ -2,15 +2,10 @@ const { User } = require('../database/models')
 const AppError = require('../utils/AppError')
 
 class GoogleService {
-  static async adminOnboarding(data) {
+  static async adminOnboarding (data) {
     console.log('📥 adminOnboarding called with:', data)
 
-    const {
-      first_name,
-      last_name,
-      email,
-      phone
-    } = data
+    const { first_name, last_name, email, phone } = data
 
     if (!first_name || !last_name || !email) {
       console.log('❌ Validation failed:', {
@@ -21,7 +16,8 @@ class GoogleService {
 
       throw new AppError(
         'First name, last name and email are required.',
-        400
+        400,
+        'VALIDATION_ERROR'
       )
     }
 
@@ -33,15 +29,16 @@ class GoogleService {
       }
     })
 
-    console.log('👤 Existing user:', existingUser ? existingUser.toJSON() : null)
+    console.log(
+      '👤 Existing user:',
+      existingUser ? existingUser.toJSON() : null
+    )
 
     if (existingUser) {
       console.log('❌ User already exists')
 
-      throw new AppError(
-        'A user with this email already exists.',
-        409
-      )
+      // throw new AppError('A user with this email already exists.', 409)
+      throw new AppError('A user with this email already exists.', 409, 'VALIDATION_ERROR')
     }
 
     console.log('➕ Creating new admin user...')

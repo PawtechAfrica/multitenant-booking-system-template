@@ -28,6 +28,10 @@ module.exports = sequelize => {
         foreignKey: 'user_id',
         as: 'refreshTokens'
       })
+      User.hasMany(models.InviteToken, {
+        foreignKey: 'user_id',
+        as: 'inviteTokens'
+      })
     }
   }
 
@@ -70,7 +74,7 @@ module.exports = sequelize => {
       is_active: {
         type: DataTypes.BOOLEAN,
         defaultValue: true
-      },
+      }
     },
     {
       sequelize,

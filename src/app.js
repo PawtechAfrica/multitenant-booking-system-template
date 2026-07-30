@@ -37,6 +37,9 @@ const adminMediaRoutes = require('./routes/admin/media.routes')
 const galleryRoutes = require('./routes/galleryItem.routes')
 const adminGalleryRoutes = require('./routes/admin/galleryItem.routes')
 const googleRoutes = require('./routes/google.routes')
+const adminStaffInviteRoutes = require('./routes/admin/staffInvite.routes')
+const inviteRoutes = require('./routes/invite.routes')
+
 
 const { startExpireBookingsJob } = require('./utils/jobs/expireBookings.job')
 
@@ -109,8 +112,10 @@ app.use('/api/v1/admin/media', adminMediaRoutes)
 app.use('/api/v1/properties/:propertySlug/gallery', resolveProperty, galleryRoutes)
 app.use('/api/v1/admin/gallery', adminGalleryRoutes)
 app.use('/api/v1/google', googleRoutes)
+app.use('/api/v1/admin/staff', adminStaffInviteRoutes) // adds /pending, /pending/:id/invite, /pending/:id alongside your existing staff routes
+app.use('/api/v1/invites', inviteRoutes)
 
-// "https://3bd2-105-163-2-215.ngrok-free.app/api/v1/admin-onboarding",
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({
