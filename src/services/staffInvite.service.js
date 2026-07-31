@@ -23,17 +23,7 @@ const listPendingStaff = async () => {
   return users.map(serializePendingUser)
 }
 
-const invitePendingUser = async (userId, { propertyId, role }) => {
-  const user = await User.findOne({ where: { id: userId, password_hash: null } })
-  if (!user) throw new AppError('Pending applicant not found.', 404, 'VALIDATION_ERROR')
-
-  const property = await Property.findByPk(propertyId)
-  if (!property) throw new AppError('Property not found.', 404, 'PROPERTY_NOT_FOUND')
-
-  user.property_id = propertyId
-  user.role = role
-  await user.save()
-
+const sendInviteEmail = async (user, property) => {
   const { raw, hash } = genInviteRaw()
   const expiresAt = new Date()
   expiresAt.setHours(expiresAt.getHours() + INVITE_HOURS)
@@ -47,12 +37,58 @@ const invitePendingUser = async (userId, { propertyId, role }) => {
   try {
     await resend.emails.send({ from: `${sender.name} <${sender.from}>`, to: user.email, subject, html })
   } catch (err) {
-    console.error('[staffInvite] failed to send invite email:', err.message)
-    throw new AppError('User was assigned but the invite email failed to send. Check email config and retry.', 502, 'VALIDATION_ERROR')
+    console.log('[staffInvite] failed to send invite email:', err.message)
+    throw new AppError('Account was created but the invite email failed to send. Check email config and retry.', 502, 'VALIDATION_ERROR')
   }
+}
+
+const invitePendingUser = async (userId, { propertyId, role }) => {
+  const user = await User.findOne({ where: { id: userId, password_hash: null } })
+  if (!user) throw new AppError('Pending applicant not found.', 404, 'VALIDATION_ERROR')
+
+  const property = await Property.findByPk(propertyId)
+  if (!property) throw new AppError('Property not found.', 404, 'PROPERTY_NOT_FOUND')
+
+  user.property_id = propertyId
+  user.role = role
+  await user.save()
+
+  await sendInviteEmail(user, property)
 
   return serializePendingUser(user)
 }
+
+
+// const invitePendingUser = async (userId, { propertyId, role }) => {
+//   const user = await User.findOne({ where: { id: userId, password_hash: null } })
+//   if (!user) throw new AppError('Pending applicant not found.', 404, 'VALIDATION_ERROR')
+
+//   const property = await Property.findByPk(propertyId)
+//   if (!property) throw new AppError('Property not found.', 404, 'PROPERTY_NOT_FOUND')
+
+//   user.property_id = propertyId
+//   user.role = role
+//   await user.save()
+
+//   const { raw, hash } = genInviteRaw()
+//   const expiresAt = new Date()
+//   expiresAt.setHours(expiresAt.getHours() + INVITE_HOURS)
+
+//   await InviteToken.create({ user_id: user.id, token_hash: hash, expires_at: expiresAt })
+
+//   const link = `${process.env.ADMIN_APP_URL}/set-password?token=${raw}`
+//   const sender = getSender(property.slug)
+//   const { subject, html } = templates.staffInvite(user, property, link)
+
+//   try {
+//     await resend.emails.send({ from: `${sender.name} <${sender.from}>`, to: user.email, subject, html })
+//   } catch (err) {
+//     console.error('[staffInvite] failed to send invite email:', err.message)
+//     throw new AppError('User was assigned but the invite email failed to send. Check email config and retry.', 502, 'VALIDATION_ERROR')
+//   }
+
+//   return serializePendingUser(user)
+// }
 
 const rejectPendingUser = async (userId) => {
   const user = await User.findOne({ where: { id: userId, password_hash: null } })
@@ -110,4 +146,6 @@ const acceptInvite = async ({ token, password }) => {
   }
 }
 
-module.exports = { listPendingStaff, invitePendingUser, rejectPendingUser, getInviteDetails, acceptInvite }
+// module.exports = { listPendingStaff, invitePendingUser, rejectPendingUser, getInviteDetails, acceptInvite }
+
+module.exports = { listPendingStaff, invitePendingUser, rejectPendingUser, getInviteDetails, acceptInvite, sendInviteEmail }

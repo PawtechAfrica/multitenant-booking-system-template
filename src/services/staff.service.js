@@ -1,7 +1,53 @@
+// const { User, Property } = require('../database/models')
+// const AppError = require('../utils/AppError')
+// const { hashPassword } = require('../utils/password')
+// const { generateTempPassword } = require('../utils/tempPassword')
+
+// const serializeStaff = (user) => ({
+//   id: user.id,
+//   email: user.email,
+//   firstName: user.first_name,
+//   lastName: user.last_name,
+//   role: user.role,
+//   propertyId: user.property_id,
+//   isActive: user.is_active
+// })
+
+// const createStaff = async ({ email, firstName, lastName, role, propertyId }) => {
+//   const existing = await User.findOne({ where: { email } })
+//   if (existing) {
+//     throw new AppError('An account with this email already exists.', 409, 'VALIDATION_ERROR')
+//   }
+
+//   const property = await Property.findByPk(propertyId)
+//   if (!property) {
+//     throw new AppError('Property not found.', 404, 'PROPERTY_NOT_FOUND')
+//   }
+
+//   const tempPassword = generateTempPassword()
+//   const password_hash = await hashPassword(tempPassword)
+
+//   const user = await User.create({
+//     email,
+//     first_name: firstName,
+//     last_name: lastName,
+//     role,
+//     property_id: propertyId,
+//     password_hash,
+//     is_active: true
+//   })
+
+//   return {
+//     ...serializeStaff(user),
+//     tempPassword // TODO: remove once email invites are wired up -- for now the superadmin must relay this manually
+//   }
+// }
+
+
+
 const { User, Property } = require('../database/models')
 const AppError = require('../utils/AppError')
-const { hashPassword } = require('../utils/password')
-const { generateTempPassword } = require('../utils/tempPassword')
+const { sendInviteEmail } = require('./staffInvite.service')
 
 const serializeStaff = (user) => ({
   id: user.id,
@@ -24,24 +70,26 @@ const createStaff = async ({ email, firstName, lastName, role, propertyId }) => 
     throw new AppError('Property not found.', 404, 'PROPERTY_NOT_FOUND')
   }
 
-  const tempPassword = generateTempPassword()
-  const password_hash = await hashPassword(tempPassword)
-
   const user = await User.create({
     email,
     first_name: firstName,
     last_name: lastName,
     role,
     property_id: propertyId,
-    password_hash,
-    is_active: true
+    password_hash: null,
+    is_active: false
   })
 
-  return {
-    ...serializeStaff(user),
-    tempPassword // TODO: remove once email invites are wired up -- for now the superadmin must relay this manually
-  }
+  await sendInviteEmail(user, property)
+
+  return serializeStaff(user)
 }
+
+// listStaff, updateStaff, deactivateStaff stay exactly as they already are — unchanged
+
+
+
+
 
 const listStaff = async (propertyId) => {
   const where = {
